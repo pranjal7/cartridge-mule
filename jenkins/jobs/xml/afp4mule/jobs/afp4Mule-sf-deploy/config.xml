@@ -1,0 +1,217 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>The AFP4Mule sample application deploy job.</description>
+  <logRotator class="hudson.tasks.LogRotator">
+    <daysToKeep>7</daysToKeep>
+    <numToKeep>7</numToKeep>
+    <artifactDaysToKeep>7</artifactDaysToKeep>
+    <artifactNumToKeep>7</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>PARENT_BUILD</name>
+          <description>The parent build to pull the artifact from.</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>B</name>
+          <description>The build number of the parent build to pull.</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>ENVIRONMENT</name>
+          <description>Environment to deploy build.</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>ENV001</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>MULE_EE_SERVER_IP</name>
+          <description>Mule EE server ipaddress</description>
+          <defaultValue>10.0.6.6</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>MULE_EE_CONTAINER_NAME</name>
+          <description>Mule EE container name</description>
+          <defaultValue>afp4mule-mule-env001</defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+    <com.sonyericsson.rebuild.RebuildSettings plugin="rebuild@1.25">
+      <autoRebuild>false</autoRebuild>
+      <rebuildDisabled>false</rebuildDisabled>
+    </com.sonyericsson.rebuild.RebuildSettings>
+    <de.pellepelster.jenkins.walldisplay.WallDisplayJobProperty plugin="jenkinswalldisplay@0.6.30"/>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@2.3.5">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>ssh://jenkins@10.0.0.198:29418/DevOps-ENV</url>
+        <credentialsId>adop-jenkins-master</credentialsId>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions>
+      <hudson.plugins.git.extensions.impl.RelativeTargetDirectory>
+        <relativeTargetDir>devops_envs/</relativeTargetDir>
+      </hudson.plugins.git.extensions.impl.RelativeTargetDirectory>
+    </extensions>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.35.2">
+      <project>${PARENT_BUILD}</project>
+      <filter>target/*.zip, afp4mule_env_default.properties</filter>
+      <target></target>
+      <excludes></excludes>
+      <selector class="hudson.plugins.copyartifact.SpecificBuildSelector">
+        <buildNumber>${B}</buildNumber>
+      </selector>
+      <doNotFingerprintArtifacts>false</doNotFingerprintArtifacts>
+    </hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash --login
+
+DOCKER_VERSION=1.6.0
+
+wget https://get.docker.com/builds/Linux/x86_64/docker-${DOCKER_VERSION} --quiet -O docker
+chmod +x ./docker
+
+echo 
+echo &quot;***************************************&quot;
+echo  &quot;Preparing build artifact(s) for tokenization&quot;
+echo  &quot;  - application of environment specific configuration.&quot;
+echo &quot;***************************************&quot;
+
+ARTIFACTS=$(find target/ -name *.zip) 
+
+mkdir -p ${WORKSPACE}/{artifacts,tokenized}/
+
+for ARTIFACT in ${ARTIFACTS} 
+do 
+  unzip $ARTIFACT -d ${WORKSPACE}/artifacts/$(basename $ARTIFACT .zip)
+done
+
+# Clear up target directory
+rm -rf ${WORKSPACE}/target/
+
+echo 
+echo &quot;***************************************&quot;
+echo  &quot;Tokenizing build(s)&quot;
+echo &quot;***************************************&quot;
+
+./docker login -u devops.training -p ztNsaJPyrSyrPdtn -e devops.training@accenture.com docker.accenture.com
+./docker \
+	run \
+    -t \
+    --rm \
+    -v /data/jenkins/home/jobs/afp4mule/jobs/afp4Mule-sf-deploy/workspace/:/root/workdir/artifacts/ \
+    docker.accenture.com/adop/tokenization:0.0.1 perl -e &apos;open (MYFILELIST, &quot;&gt;&quot;, &quot;/root/workdir/artifacts/files_to_tokenise.txt&quot;) || die $!;my @targetFiles=qx(find /root/workdir/artifacts/ -name &quot;*.template&quot;);foreach (@targetFiles) {print MYFILELIST &quot;file=$_&quot;};close MYFILELIST;&apos;
+
+./docker \
+	run \
+    -t \
+    --rm \
+    -v /data/jenkins/home/jobs/afp4mule/jobs/afp4Mule-sf-deploy/workspace/:/root/workdir/artifacts/ \
+    docker.accenture.com/adop/tokenization:0.0.1 perl /root/workdir/token_resolver_template.pl --tokenFile /root/workdir/artifacts/devops_envs/${ENVIRONMENT}.properties --tokenFile /root/workdir/artifacts/afp4mule_env_default.properties --fileList /root/workdir/artifacts/files_to_tokenise.txt --force
+
+echo 
+echo &quot;***************************************&quot;
+echo  &quot;Packaging tokenized build(s)&quot;
+echo &quot;***************************************&quot;
+
+
+ARTIFACTS=$(find artifacts/ -maxdepth 1 -mindepth 1 -type d)
+
+for ARTIFACT in ${ARTIFACTS} 
+do 
+  cd $ARTIFACT
+  zip -r ${WORKSPACE}/tokenized/$(basename $ARTIFACT) ./*
+done
+
+echo 
+echo &quot;***************************************&quot;
+echo  &quot;Deploying artifact(s)&quot;
+echo &quot;***************************************&quot;
+
+
+ARTIFACTS=$(find ${WORKSPACE}/tokenized/ -name *.zip)
+
+for ARTIFACT in ${ARTIFACTS} 
+do 
+  scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $ARTIFACT ec2-user@${MULE_EE_SERVER_IP}:~/
+done
+
+ssh -tt -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ec2-user@${MULE_EE_SERVER_IP} &apos;
+      sudo docker stop mule-runtime
+      sudo rm -rf /data/mule/apps/*
+      for i in $(find ~/. -name *.zip)
+      do
+        sudo unzip ${i} -d /data/mule/apps/$(basename ${i} .zip) 1&gt;/dev/null
+      done
+      
+      sudo docker start mule-runtime
+&apos;
+
+echo 
+echo &quot;***************************************&quot;
+echo  &quot;Artifact(s) deployed&quot;
+echo &quot;***************************************&quot;
+
+
+echo 
+echo &quot;***************************************&quot;
+echo  &quot;Health Check&quot;
+echo &quot;***************************************&quot;
+
+SLEEP_TIME=&quot;30&quot;
+COUNT=0
+
+echo &quot;Waiting for environment to become accessible.&quot;
+until curl -sL -w &quot;%{http_code}\\n&quot; &quot;http://${MULE_EE_CONTAINER_NAME}.service.adop.consul:8084/api/&quot; -o /dev/null | grep &quot;200&quot; &amp;&gt; /dev/null
+do
+    if [ &quot;${COUNT}&quot; == &quot;10&quot; ]
+      then
+      echo &quot;Exititing Attempt ${COUNT} : Environment not accessible&quot;
+      exit 1
+    fi
+
+    echo &quot;Attempt ${COUNT} : Environment not accessible, sleeping for ${SLEEP_TIME}&quot;
+    sleep &quot;${SLEEP_TIME}&quot;
+    COUNT=$((COUNT+1))
+done
+
+echo 
+echo &quot;***************************************&quot;
+echo  &quot;Artifact(s) deployed succesfully&quot;
+echo &quot;***************************************&quot;
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.26">
+      <deleteDirs>false</deleteDirs>
+      <cleanupParameter></cleanupParameter>
+      <externalDelete></externalDelete>
+    </hudson.plugins.ws__cleanup.PreBuildCleanup>
+  </buildWrappers>
+</project>

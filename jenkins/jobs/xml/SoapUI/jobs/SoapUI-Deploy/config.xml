@@ -1,0 +1,94 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>STUB_NUMBER</name>
+          <description></description>
+          <defaultValue>10.0.0.10:5000/soapui_stub:31</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>SOAPUI_IP</name>
+          <description></description>
+          <defaultValue>10.0.6.9</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>SOAPUI_BUILD_WORKSPACE</name>
+          <description></description>
+          <defaultValue>/home/ec2-user/workspace/SoapUI/SoapUI-Build</defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+    <com.sonyericsson.rebuild.RebuildSettings plugin="rebuild@1.25">
+      <autoRebuild>false</autoRebuild>
+      <rebuildDisabled>false</rebuildDisabled>
+    </com.sonyericsson.rebuild.RebuildSettings>
+    <de.pellepelster.jenkins.walldisplay.WallDisplayJobProperty plugin="jenkinswalldisplay@0.6.30"/>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <assignedNode>docker</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+#-ex
+########## Pull image from repo to SoapUI machine ##########
+########## Run docker containers using the defined ports ########## 
+printf &quot;Stopping and removing SoapUI docker containers from machine if they are present\n&quot; 
+ssh -t -t -y -o StrictHostKeyChecking=no ec2-user@$SOAPUI_IP &apos;sudo docker rm -f $(sudo docker ps -a -q -f name=&quot;SoapUI&quot;)&apos;
+ 
+ssh -t -t -y -o StrictHostKeyChecking=no ec2-user@$SOAPUI_IP &quot;sudo docker pull $STUB_IMAGE&quot; 
+
+printf &quot;\n\n################### Control Outputs ####################\n&quot;
+echo &quot;Number of stubs: $FILES_COUNT&quot;
+
+#FILES_LIST is sorted 
+echo &quot;Stubs to be created: $FILES_LIST&quot;
+
+# echo $PORTS_OPENED PORTS=($PORTS_OPENED) 
+echo &quot;Opened ports: ${PORTS_OPENED}&quot;
+printf &quot;################### End of Control Outputs ####################\n&quot;
+
+
+########## Turn strings to arrays #########
+PORTS_OPENED=($PORTS_OPENED)
+FILES=$(echo $FILES_LIST | tr &apos;,&apos; &apos; &apos;) 
+FILES_ARR=($FILES)
+
+
+########## Iterate through stubs and deploy them as docker containers #########
+for i in `seq 1 $FILES_COUNT`;do
+	printf &quot;\n\n&quot;
+    echo &quot;#################### SoapUI-Stub-Server-${PORTS_OPENED[$i-1]} ##################&quot;
+    echo &quot;sudo docker run -itd --name SoapUI-Stub-Server-${PORTS_OPENED[$i-1]} -p ${PORTS_OPENED[$i-1]}:${PORTS_OPENED[$i-1]}/TCP $STUB_IMAGE \
+nohup /opt/SoapUI/SoapUI-5.2.1/bin/mockservicerunner.sh /opt/SoapUI/SoapUI-5.2.1/Stubs/${FILES_ARR[$i-1]} &gt; /opt/SoapUI/${PORTS_OPENED[$i-1]} &amp;&quot;
+	printf &quot;\n######### Starting SoapUI Servers ##########\n&quot;
+    
+	ssh -t -t -y -o StrictHostKeyChecking=no ec2-user@$SOAPUI_IP &quot;sudo docker run -itd --name SoapUI-Stub-Server-${PORTS_OPENED[$i-1]} -p ${PORTS_OPENED[$i-1]}:${PORTS_OPENED[$i-1]}/TCP $STUB_IMAGE \
+nohup /opt/SoapUI/SoapUI-5.2.1/bin/mockservicerunner.sh /opt/SoapUI/SoapUI-5.2.1/Stubs/${FILES_ARR[$i-1]}&quot;
+	
+done 
+
+########## End of block ########## 
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <com.cloudbees.jenkins.plugins.sshagent.SSHAgentBuildWrapper plugin="ssh-agent@1.7">
+      <credentialIds>
+        <string>adop-jenkins-master</string>
+      </credentialIds>
+      <ignoreMissing>false</ignoreMissing>
+    </com.cloudbees.jenkins.plugins.sshagent.SSHAgentBuildWrapper>
+  </buildWrappers>
+</project>
