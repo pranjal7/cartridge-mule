@@ -51,7 +51,7 @@ createMuleStack.with{
 			export AWS_DEFAULT_REGION='eu-west-1'
 
 			# Variables
-			NAMESPACE=$( echo "${PROJECT_NAME}" | sed "s#[\/_ ]#-#g" )
+			NAMESPACE=$( echo "${PROJECT_NAME}" | sed "s#[\\/_ ]#-#g" )
 			FULL_ENVIRONMENT_NAME="${NAMESPACE}-${ENVIRONMENT_NAME}"
 			INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
 			VPC_ID=$(${JENKINS_HOME}/tools/.aws/bin/aws ec2 describe-instances --instance-ids ${INSTANCE_ID}           --query 'Reservations[0].Instances[0].VpcId' --output text);
