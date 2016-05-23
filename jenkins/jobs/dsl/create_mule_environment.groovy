@@ -46,7 +46,7 @@ createMuleStack.with{
 		maskPasswords()
 		sshAgent("adop-jenkins-master")
 		credentialsBinding {
-		  usernamePassword("AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_CREDENTIALS")
+		  usernamePassword("AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", '${AWS_CREDENTIALS}')
 		}
 	}
 	steps {
