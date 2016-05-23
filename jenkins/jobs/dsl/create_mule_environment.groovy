@@ -5,9 +5,7 @@ def projectFolderName = "${PROJECT_NAME}"
 
 // Variables
 // **The git repo variables will be changed to the users' git repositories manually in the Jenkins jobs**
-// def muleCFRepository = "mule-cloudformation-aws-environment"
-// def muleCFGitUrl = "ssh://jenkins@gerrit:29418/${PROJECT_NAME}/" + muleCFRepository
-def muleeCFTemplateGitUrl = "git@innersource.accenture.com:digital-1-cartridges/mule_environment_template.git" 
+def environmentTemplateGitUrl = "git@innersource.accenture.com:digital-1-cartridges/mule_environment_template.git"
 
 // Jobs
 def createMuleStack = freeStyleJob(projectFolderName + "/Create_Mule_Stack")
@@ -19,6 +17,7 @@ createMuleStack.with{
 		numToKeep(25)
     }
 	parameters{
+		stringParam("GIT_URL","git@innersource.accenture.com:digital-1-cartridges/mule_environment_template.git","The URL of the git repo for Platform Extension")
 		stringParam("STACK_NAME","","The name of the new stack")
         stringParam("KEY_NAME","","Name of the key for this stack")
 		credentialsParam("AWS_CREDENTIALS"){
@@ -35,7 +34,7 @@ createMuleStack.with{
 		git{
 			remote{
 				name("origin")
-				url(${muleeCFTemplateGitUrl})
+				url("${environmentTemplateGitUrl}")
 				credentials("adop-jenkins-master")
 			}
 			branch("*/master")
