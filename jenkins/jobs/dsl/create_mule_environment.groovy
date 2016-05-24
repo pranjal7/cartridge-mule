@@ -3,7 +3,7 @@ def workspaceFolderName = "${WORKSPACE_NAME}"
 def projectFolderName = "${PROJECT_NAME}"
 
 // Variables
-def environmentTemplateGitUrl = "git@innersource.accenture.com:digital-1-cartridges/mule_environment_template.git"
+def environmentTemplateGitUrl = "git@innersource.accenture.com:digital-1-cartridges/mule_environment_template"
 
 // Jobs
 def createMuleStack = freeStyleJob(projectFolderName + "/Create_Mule_Stack")
@@ -15,7 +15,7 @@ createMuleStack.with{
 		numToKeep(25)
     }
 	parameters{
-		stringParam("GIT_URL","git@innersource.accenture.com:digital-1-cartridges/mule_environment_template.git","The URL of the git repo for Platform Extension")
+		stringParam("GIT_URL","git@innersource.accenture.com:digital-1-cartridges/mule_environment_template","The URL of the git repo for Platform Extension")
 		stringParam("STACK_NAME","","The name of the new stack")
         stringParam("KEY_NAME","","Name of the key for this stack")
 		credentialsParam("AWS_CREDENTIALS"){
@@ -53,7 +53,7 @@ createMuleStack.with{
 			# Variables
 			export AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
 			INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
-			PUBLIC_IP=$(curl http://169.254.169.254/latest/meta-data/public-ipv4
+			PUBLIC_IP=$(curl http://169.254.169.254/latest/meta-data/public-ipv4)
 			if [ -z $VPC_ID ]; then
 				echo "VPC ID not set, using default VPC where ADOP is deployed..."
 				VPC_ID=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[0].Instances[0].VpcId' --output text);
@@ -71,7 +71,8 @@ createMuleStack.with{
 			ParameterKey=NatInstanceId,ParameterValue=${INSTANCE_ID} \
 			ParameterKey=PublicIp,ParameterValue=${PUBLIC_IP} \
 			ParameterKey=VpcId,ParameterValue=${VPC_ID} \
-			ParameterKey=KeyName,ParameterValue=${KEY_NAME}
+			ParameterKey=KeyName,ParameterValue=${KEY_NAME} \
+			ParameterKey=PrivateIpAddress,ParameterValue=${Private_Ip_Address}
 			
 			# Keep looping whilst the stack is being created
 				SLEEP_TIME=60
