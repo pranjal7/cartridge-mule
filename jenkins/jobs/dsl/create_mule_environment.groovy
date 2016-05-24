@@ -66,13 +66,13 @@ createMuleStack.with{
 			
 			aws cloudformation create-stack --stack-name ${STACK_NAME} \
 			--tags "Key=CreatedBy,Value=ADOP-Jenkins" \
-			--template-body file:////$WORKSPACE//aws_mule_template.json \
+			--template-body file://$WORKSPACE/aws/aws_mule_template.json \
 			--parameters \
 			ParameterKey=NatInstanceId,ParameterValue=${INSTANCE_ID} \
 			ParameterKey=PublicIp,ParameterValue=${PUBLIC_IP} \
 			ParameterKey=VpcId,ParameterValue=${VPC_ID} \
 			ParameterKey=KeyName,ParameterValue=${KEY_NAME} \
-			ParameterKey=PrivateIpAddress,ParameterValue=${Private_Ip_Address}
+			#ParameterKey=PrivateIpAddress,ParameterValue=${Private_Ip_Address}
 			
 			# Keep looping whilst the stack is being created
 				SLEEP_TIME=60
