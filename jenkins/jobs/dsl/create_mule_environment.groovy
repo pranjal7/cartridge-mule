@@ -2,17 +2,15 @@
 def workspaceFolderName = "${WORKSPACE_NAME}"
 def projectFolderName = "${PROJECT_NAME}"
 
-
 // Variables
-// **The git repo variables will be changed to the users' git repositories manually in the Jenkins jobs**
 def environmentTemplateGitUrl = "git@innersource.accenture.com:digital-1-cartridges/mule_environment_template.git"
 
 // Jobs
 def createMuleStack = freeStyleJob(projectFolderName + "/Create_Mule_Stack")
 
-// Setup setup_cartridge
+// Create Mule Stack
 createMuleStack.with{
-	description("Job to provision the envirnment for Mule")
+	description("Job to provision the environment for Mule")
 	logRotator {
 		numToKeep(25)
     }
@@ -68,7 +66,7 @@ createMuleStack.with{
 			
 			aws cloudformation create-stack --stack-name ${STACK_NAME} \
 			--tags "Key=CreatedBy,Value=ADOP-Jenkins" \
-			--template-body file://aws/aws_mule_template.json \
+			--template-body file:////$WORKSPACE//aws_mule_template.json \
 			--parameters \
 			ParameterKey=NatInstanceId,ParameterValue=${INSTANCE_ID} \
 			ParameterKey=PublicIp,ParameterValue=${PUBLIC_IP} \
