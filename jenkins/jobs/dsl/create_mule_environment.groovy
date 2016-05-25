@@ -55,7 +55,7 @@ createMuleStack.with{
 			# Variables
 			export AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
 			INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
-			VPC_ID=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[0].Instances[0].VpcId' --output text);
+			VPC_ID=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[0].Instances[0].VpcId' --output text)
 			#SUBNET_ID=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[0].Instances[0].SubnetId' --output text)
 			NAT_GATEWAY_ID=$(aws ec2 describe-nat-gateways --filter Name=vpc-id,Values=${VPC_ID} --query 'NatGateways[*].NatGatewayId' --output text)
 			PUBLIC_IP=$(curl http://169.254.169.254/latest/meta-data/public-ipv4)
@@ -75,7 +75,7 @@ createMuleStack.with{
 			ParameterKey=VpcId,ParameterValue=${VPC_ID} \
 			ParameterKey=KeyName,ParameterValue=${KEY_NAME} \
 			#ParameterKey=InternetGateway,ParameterValue=${INTERNET_GATEWAY_ID}
-			#ParameterKey=PrivateIp,ParameterValue=${PRIVATE_IP}
+			ParameterKey=PrivateIp,ParameterValue=${PRIVATE_IP}
 			
 			# Keep looping whilst the stack is being created
 				SLEEP_TIME=60
