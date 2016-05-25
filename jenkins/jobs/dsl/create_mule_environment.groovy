@@ -17,6 +17,7 @@ createMuleStack.with{
 	parameters{
 		stringParam("GIT_URL","git@innersource.accenture.com:digital-1-cartridges/mule_environment_template","The URL of the git repo for Platform Extension")
 		stringParam("STACK_NAME","","The name of the new stack")
+		stringParam("TAG_PROJECT_NAME","","The name of the project to tag instances with")
         stringParam("KEY_NAME","","Name of the key for this stack")
 		credentialsParam("AWS_CREDENTIALS"){
 			type('com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl')
@@ -65,7 +66,7 @@ createMuleStack.with{
 			
 			
 			aws cloudformation create-stack --stack-name ${STACK_NAME} \
-			--tags "Key=CreatedBy,Value=ADOP-Jenkins" \
+			--tags "Key=CreatedBy,Value=ADOP-Jenkins" "Key=Project,Value=${TAG_PROJECT_NAME}" \
 			--template-body file://$WORKSPACE/aws/aws_mule_template.json \
 			--parameters \
 			ParameterKey=NatInstanceId,ParameterValue=${INSTANCE_ID} \
