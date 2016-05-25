@@ -76,8 +76,8 @@ createMuleStack.with{
 			ParameterKey=PrivateIp,ParameterValue=${PRIVATE_IP}
 			
 			#Old values that are no longer used
-			#ParameterKey=PublicIp,ParameterValue=${PUBLIC_IP} \			
-			#ParameterKey=InternetGateway,ParameterValue=${INTERNET_GATEWAY_ID} \
+			#ParameterKey=PublicIp,ParameterValue=${PUBLIC_IP} 			
+			#ParameterKey=InternetGateway,ParameterValue=${INTERNET_GATEWAY_ID} 
 			
 			# Keep looping whilst the stack is being created
 				SLEEP_TIME=60
