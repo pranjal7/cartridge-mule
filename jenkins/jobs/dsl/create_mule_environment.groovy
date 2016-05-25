@@ -71,11 +71,13 @@ createMuleStack.with{
 			--template-body file://$WORKSPACE/aws/aws_mule_template.json \
 			--parameters \
 			ParameterKey=NatInstanceId,ParameterValue=${NAT_GATEWAY_ID} \
-			#ParameterKey=PublicIp,ParameterValue=${PUBLIC_IP} \
 			ParameterKey=VpcId,ParameterValue=${VPC_ID} \
 			ParameterKey=KeyName,ParameterValue=${KEY_NAME} \
-			#ParameterKey=InternetGateway,ParameterValue=${INTERNET_GATEWAY_ID}
 			ParameterKey=PrivateIp,ParameterValue=${PRIVATE_IP}
+			
+			#Old values that are no longer used
+			#ParameterKey=PublicIp,ParameterValue=${PUBLIC_IP} \			
+			#ParameterKey=InternetGateway,ParameterValue=${INTERNET_GATEWAY_ID} \
 			
 			# Keep looping whilst the stack is being created
 				SLEEP_TIME=60
