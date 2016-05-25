@@ -55,7 +55,7 @@ createMuleStack.with{
 			export AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
 			INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
 			PUBLIC_IP=$(curl http://169.254.169.254/latest/meta-data/public-ipv4)
-			INTERNET_GATEWAY_ID=$(aws ec2 describe-internet-gateways --filters "Name=attachment.vpc-id,Values=$VPC_ID" --query 'InternetGateways[0].InternetGatewayId' --output text)
+			#INTERNET_GATEWAY_ID=$(aws ec2 describe-internet-gateways --filters "Name=attachment.vpc-id,Values=$VPC_ID" --query 'InternetGateways[0].InternetGatewayId' --output text)
 			if [ -z $VPC_ID ]; then
 				echo "VPC ID not set, using default VPC where ADOP is deployed..."
 				VPC_ID=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[0].Instances[0].VpcId' --output text);
@@ -74,7 +74,7 @@ createMuleStack.with{
 			ParameterKey=PublicIp,ParameterValue=${PUBLIC_IP} \
 			ParameterKey=VpcId,ParameterValue=${VPC_ID} \
 			ParameterKey=KeyName,ParameterValue=${KEY_NAME} \
-			ParameterKey=InternetGateway,ParameterValue=${INTERNET_GATEWAY_ID} \
+			#ParameterKey=InternetGateway,ParameterValue=${INTERNET_GATEWAY_ID}
 			#ParameterKey=PrivateIpAddress,ParameterValue=${Private_Ip_Address}
 			
 			# Keep looping whilst the stack is being created
