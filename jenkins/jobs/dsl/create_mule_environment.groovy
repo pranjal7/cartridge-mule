@@ -19,6 +19,7 @@ createMuleStack.with{
 		stringParam("STACK_NAME","","The name of the new stack")
 		stringParam("TAG_PROJECT_NAME","","The name of the project to tag instances with")
         stringParam("KEY_NAME","","Name of the key for this stack")
+		stringParam("PRIVATE_IP","10.0.6.6","PrivateIp address for Mule Env")
 		credentialsParam("AWS_CREDENTIALS"){
 			type('com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl')
 			description('AWS access key and secret key for your account')
@@ -54,12 +55,11 @@ createMuleStack.with{
 			# Variables
 			export AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
 			INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
+			VPC_ID=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[0].Instances[0].VpcId' --output text);
+			#SUBNET_ID=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[0].Instances[0].SubnetId' --output text)
+			NAT_GATEWAY_ID=$(aws ec2 describe-nat-gateways --filter Name=attachment.vpc-id,Values=${VPC_ID} --query 'NatGateways[*].NatGatewayId' --output text)
 			PUBLIC_IP=$(curl http://169.254.169.254/latest/meta-data/public-ipv4)
 			#INTERNET_GATEWAY_ID=$(aws ec2 describe-internet-gateways --filters "Name=attachment.vpc-id,Values=$VPC_ID" --query 'InternetGateways[0].InternetGatewayId' --output text)
-			if [ -z $VPC_ID ]; then
-				echo "VPC ID not set, using default VPC where ADOP is deployed..."
-				VPC_ID=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[0].Instances[0].VpcId' --output text);
-			fi
 			
 			#ADOP_CIDR=$(aws ec2 describe-subnets --subnet-ids ${AWS_SUBNET_ID} --query 'Subnets[0].CidrBlock' --output text)
 			#ADOP_AZ=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[0].Instances[0].Placement.AvailabilityZone' --output text)
@@ -70,12 +70,12 @@ createMuleStack.with{
 			--tags "Key=CreatedBy,Value=ADOP-Jenkins" "Key=Project,Value=${TAG_PROJECT_NAME}" \
 			--template-body file://$WORKSPACE/aws/aws_mule_template.json \
 			--parameters \
-			ParameterKey=NatInstanceId,ParameterValue=${INSTANCE_ID} \
-			ParameterKey=PublicIp,ParameterValue=${PUBLIC_IP} \
+			ParameterKey=NatInstanceId,ParameterValue=${NAT_GATEWAY_ID} \
+			#ParameterKey=PublicIp,ParameterValue=${PUBLIC_IP} \
 			ParameterKey=VpcId,ParameterValue=${VPC_ID} \
 			ParameterKey=KeyName,ParameterValue=${KEY_NAME} \
 			#ParameterKey=InternetGateway,ParameterValue=${INTERNET_GATEWAY_ID}
-			#ParameterKey=PrivateIpAddress,ParameterValue=${Private_Ip_Address}
+			#ParameterKey=PrivateIp,ParameterValue=${PRIVATE_IP}
 			
 			# Keep looping whilst the stack is being created
 				SLEEP_TIME=60
