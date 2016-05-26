@@ -70,7 +70,7 @@ createMuleStack.with{
 			--tags "Key=CreatedBy,Value=ADOP-Jenkins" "Key=Project,Value=${TAG_PROJECT_NAME}" \
 			--template-body file://$WORKSPACE/aws/aws_mule_template.json \
 			--parameters \
-			ParameterKey=NatInstanceId,ParameterValue=${NAT_GATEWAY_ID} \
+			ParameterKey=NatGatewayId,ParameterValue=${NAT_GATEWAY_ID} \
 			ParameterKey=VpcId,ParameterValue=${VPC_ID} \
 			ParameterKey=KeyName,ParameterValue=${KEY_NAME} \
 			ParameterKey=PrivateIp,ParameterValue=${PRIVATE_IP}
