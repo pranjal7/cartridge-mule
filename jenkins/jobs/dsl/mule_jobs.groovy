@@ -256,10 +256,10 @@ deployJob.with{
                 url('${devOpsEnvGitUrl}')
                 credentials("adop-jenkins-master")
             }
+			branch('*/master')
 			extensions {
-                relativeTargetDirectory('devops_envs/')
+                relativeTargetDirectory("devops_envs")
             }
-			branch("*/master")
 		}
     }
     steps {
