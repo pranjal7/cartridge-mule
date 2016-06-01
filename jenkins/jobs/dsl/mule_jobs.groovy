@@ -258,7 +258,7 @@ deployJob.with{
             }
 			branch('*/master')
 			extensions {
-                relativeTargetDirectory("devops_envs")
+                relativeTargetDirectory('devopsenvs')
             }
 		}
     }
