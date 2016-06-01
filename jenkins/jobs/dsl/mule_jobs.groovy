@@ -104,12 +104,12 @@ buildJob.with{
         downstreamParameterized{
             trigger(projectFolderName + "/afp4Mule-Sonar"){
             condition("SUCCESS")
+			triggerWithNoParameters(false)
             parameters{
                 predefinedProp("B",'${BUILD_NUMBER}')
                 predefinedProp("PARENT_BUILD",'${JOB_NAME}')               
                 }
             }
-			triggerWithNoParameters(false)
         } 
     }
 }
