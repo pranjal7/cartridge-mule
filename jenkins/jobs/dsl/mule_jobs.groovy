@@ -6,7 +6,7 @@ def projectFolderName = "${PROJECT_NAME}"
 def muleEnvRepoName = "mule"
 def muleGitEnvUrl = "ssh://jenkins@gerrit:29418/${PROJECT_NAME}/" + muleEnvRepoName
 def devOpsEnvRepoName = "DevOpsEnv"
-def devOpsEnvGitUrl = "ssh://jenkins@gerrit:29418/${PROJECT_NAME}/" + DevOpsEnv
+def devOpsEnvGitUrl = "ssh://jenkins@gerrit:29418/${PROJECT_NAME}/" + devOpsEnvRepoName
 
 // Jobs
 def buildJob = freeStyleJob(projectFolderName + "/afp4Mule-Build")
