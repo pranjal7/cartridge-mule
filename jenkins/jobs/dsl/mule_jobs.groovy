@@ -256,10 +256,7 @@ deployJob.with{
                 url('${devOpsEnvGitUrl}')
                 credentials("adop-jenkins-master")
             }
-			branch('*/master')
-			extensions {
-				cleanAfterCheckout()
-            }
+			branch("*/master")
 		}
     }
     steps {
