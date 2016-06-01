@@ -144,15 +144,15 @@ sonarJob.with{
 		}	fingerprintArtifacts(true)
     }
     publishers{
-		sonar {
-			mavenInstallation(ADOP Maven)
+		sonar {'''
+			mavenInstallation('ADOP Maven')
 			rootPOM("mule-services-usa/pom.xml")
 			additionalProperties('-Dsonar.scm.url=scm:git:https://innersource.accenture.com/digital-1/afp4mule-reference-app.git')
             branch('feature-xy')
             overrideTriggers {
                 skipIfEnvironmentVariable('SKIP_SONAR')
             }
-		}			
+		'''}			
         downstreamParameterized{
             trigger(projectFolderName + "/afp4Mule-Sonar"){
             condition("SUCCESS")
