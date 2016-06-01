@@ -257,8 +257,7 @@ deployJob.with{
                 credentials("adop-jenkins-master")
             }
 			extensions {
-                cleanAfterCheckout()
-                relativeTargetDirectory("devops_envs/")
+                relativeTargetDirectory('devops_envs/')
             }
 			branch("*/master")
 		}
