@@ -141,12 +141,13 @@ sonarJob.with{
 			buildSelector {
                 buildNumber('${B}')
             }
-		}	fingerprintArtifacts(true)
+			fingerprintArtifacts(true)
+		}
     }
     publishers{
 		sonar {'''
 			mavenInstallation('ADOP Maven')
-			rootPOM("mule-services-usa/pom.xml")
+			rootPOM('mule-services-usa/pom.xml')
 			additionalProperties('-Dsonar.scm.url=scm:git:https://innersource.accenture.com/digital-1/afp4mule-reference-app.git')
             branch('feature-xy')
             overrideTriggers {
@@ -155,12 +156,12 @@ sonarJob.with{
 		'''}			
         downstreamParameterized{
             trigger(projectFolderName + "/afp4Mule-Sonar"){
-            condition("SUCCESS")
-            parameters{
+				condition("SUCCESS")
+				triggerWithNoParameters(false)
+				parameters{
                 predefinedProp("B",'${BUILD_NUMBER}')
                 predefinedProp("PARENT_BUILD",'${PARENT_BUILD}')               
-            }
-			triggerWithNoParameters(false)
+				}
 			}
 		} 	
     }
@@ -213,12 +214,12 @@ packageJob.with{
         downstreamParameterized{
             trigger(projectFolderName + "/afp4Mule-Deploy"){
             condition("UNSTABLE_OR_BETTER")
-            parameters{
-                predefinedProp("B",'${BUILD_NUMBER}')
-                predefinedProp("PARENT_BUILD",'${PARENT_BUILD}')               
-                }
-            }
 			triggerWithNoParameters(false)
+				parameters{
+					predefinedProp("B",'${BUILD_NUMBER}')
+					predefinedProp("PARENT_BUILD",'${PARENT_BUILD}')               
+				}
+            }
         } 
     }
 }
@@ -267,8 +268,8 @@ deployJob.with{
 			buildSelector {
                 buildNumber('${B}')
             }
-			includePatterns("mule-services-usa/usa-api/target/*.zip")
-			includePatterns("mule-services-usa/usa-api/usa_env_tokens_default.properties")
+			includePatterns('mule-services-usa/usa-api/target/*.zip')
+			includePatterns('mule-services-usa/usa-api/usa_env_tokens_default.properties')
 			fingerprintArtifacts(true)
 		}
 		shell('''#!/bin/bash ---login
