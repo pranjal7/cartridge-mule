@@ -83,6 +83,7 @@ buildJob.with{
 		}
 		systemGroovyScriptFile('/var/jenkins_home/scriptler/scripts/pipeline_params.groovy') {
         }
+	}	
     publishers{
 		archiveArtifacts {
             pattern('**/*')
@@ -99,6 +100,7 @@ buildJob.with{
                 message()
                 create(true)
             }
+		}
         downstreamParameterized{
             trigger(projectFolderName + "/afp4Mule-Sonar"){
             condition("SUCCESS")
@@ -139,7 +141,7 @@ sonarJob.with{
 			buildSelector {
                 buildNumber('${B}')
             }
-			fingerprintArtifacts(true)
+		}	fingerprintArtifacts(true)
     }
     publishers{
 		sonar {
@@ -149,17 +151,18 @@ sonarJob.with{
             branch('feature-xy')
             overrideTriggers {
                 skipIfEnvironmentVariable('SKIP_SONAR')
-            }		
+            }
+		}			
         downstreamParameterized{
             trigger(projectFolderName + "/afp4Mule-Sonar"){
             condition("SUCCESS")
             parameters{
                 predefinedProp("B",'${BUILD_NUMBER}')
                 predefinedProp("PARENT_BUILD",'${PARENT_BUILD}')               
-                }
             }
 			triggerWithNoParameters(false)
-        } 
+			}
+		} 	
     }
 }
 
