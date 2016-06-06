@@ -58,7 +58,7 @@ createMuleStack.with{
 			INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
 			VPC_ID=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[0].Instances[0].VpcId' --output text)
 			#SUBNET_ID=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[0].Instances[0].SubnetId' --output text)
-			NAT_GATEWAY_ID=$(aws ec2 describe-nat-gateways --filter Name=vpc-id,Values=${VPC_ID} --query 'NatGateways[*].NatGatewayId' --output text)
+			#NAT_GATEWAY_ID=$(aws ec2 describe-nat-gateways --filter Name=vpc-id,Values=${VPC_ID} --query 'NatGateways[*].NatGatewayId' --output text)
 			PUBLIC_IP=$(curl http://169.254.169.254/latest/meta-data/public-ipv4)
 			#INTERNET_GATEWAY_ID=$(aws ec2 describe-internet-gateways --filters "Name=attachment.vpc-id,Values=$VPC_ID" --query 'InternetGateways[0].InternetGatewayId' --output text)
 			
