@@ -20,7 +20,7 @@ createMuleStack.with{
 		stringParam("TAG_PROJECT_NAME","","The name of the project to tag instances with")
         stringParam("KEY_NAME","academy_key","Name of the key for this stack")
 		stringParam("PRIVATE_IP","10.0.6.6","PrivateIp address for Mule Env")
-		stringParam("PRIVATE_APP_SUBNET_ID}","","PrivateIp address for Mule Env")
+		stringParam("PRIVATE_APP_SUBNET_ID","","PrivateIp address for Mule Env")
 		credentialsParam("AWS_CREDENTIALS"){
 			type('com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl')
 			description('AWS access key and secret key for your account')
@@ -75,10 +75,6 @@ createMuleStack.with{
 			ParameterKey=KeyName,ParameterValue=${KEY_NAME} \
 			ParameterKey=PrivateIp,ParameterValue=${PRIVATE_IP} \
 			ParameterKey=PrivateApplicationSubnetId,ParameterValue=${PRIVATE_APP_SUBNET_ID}
-			
-			#Old values that are no longer used
-			#ParameterKey=PublicIp,ParameterValue=${PUBLIC_IP} 			
-			#ParameterKey=InternetGateway,ParameterValue=${INTERNET_GATEWAY_ID} 
 			
 			# Keep looping whilst the stack is being created
 				SLEEP_TIME=60
