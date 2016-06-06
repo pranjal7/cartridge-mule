@@ -3,7 +3,7 @@ def workspaceFolderName = "${WORKSPACE_NAME}"
 def projectFolderName = "${PROJECT_NAME}"
 
 // Variables
-def environmentTemplateGitUrl = "git@innersource.accenture.com:digital-1-cartridges/mule_environment_template"
+def environmentTemplateGitUrl = "ssh://git@newsource.accenture.com/a2482/mule_environment_template.git"
 
 // Jobs
 def createMuleStack = freeStyleJob(projectFolderName + "/Create_Mule_Stack")
@@ -35,7 +35,7 @@ createMuleStack.with{
 		git{
 			remote{
 				name("origin")
-				url("${environmentTemplateGitUrl}")
+				url("${GIT_URL}")
 				credentials("adop-jenkins-master")
 			}
 			branch("*/master")
