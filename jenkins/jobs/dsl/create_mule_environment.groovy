@@ -15,7 +15,7 @@ createMuleStack.with{
 		numToKeep(25)
     }
 	parameters{
-		stringParam("GIT_URL","git@newsource.accenture.com:a2482/mule_environment_template","The URL of the git repo for Platform Extension")
+		stringParam("GIT_URL","ssh://git@newsource.accenture.com/a2482/mule_environment_template.git","The URL of the git repo for Platform Extension")
 		stringParam("STACK_NAME","","The name of the new stack")
 		stringParam("TAG_PROJECT_NAME","","The name of the project to tag instances with")
         stringParam("KEY_NAME","academy_key","Name of the key for this stack")
