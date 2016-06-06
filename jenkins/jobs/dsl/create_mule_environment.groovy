@@ -18,8 +18,9 @@ createMuleStack.with{
 		stringParam("GIT_URL","git@innersource.accenture.com:digital-1-cartridges/mule_environment_template","The URL of the git repo for Platform Extension")
 		stringParam("STACK_NAME","","The name of the new stack")
 		stringParam("TAG_PROJECT_NAME","","The name of the project to tag instances with")
-        stringParam("KEY_NAME","","Name of the key for this stack")
+        stringParam("KEY_NAME","academy_key","Name of the key for this stack")
 		stringParam("PRIVATE_IP","10.0.6.6","PrivateIp address for Mule Env")
+		stringParam("PRIVATE_APP_SUBNET_ID}","","PrivateIp address for Mule Env")
 		credentialsParam("AWS_CREDENTIALS"){
 			type('com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl')
 			description('AWS access key and secret key for your account')
@@ -70,10 +71,10 @@ createMuleStack.with{
 			--tags "Key=CreatedBy,Value=ADOP-Jenkins" "Key=Project,Value=${TAG_PROJECT_NAME}" \
 			--template-body file://$WORKSPACE/aws/aws_mule_template.json \
 			--parameters \
-			ParameterKey=NatGatewayId,ParameterValue=${NAT_GATEWAY_ID} \
 			ParameterKey=VpcId,ParameterValue=${VPC_ID} \
 			ParameterKey=KeyName,ParameterValue=${KEY_NAME} \
-			ParameterKey=PrivateIp,ParameterValue=${PRIVATE_IP}
+			ParameterKey=PrivateIp,ParameterValue=${PRIVATE_IP} \
+			ParameterKey=PrivateApplicationSubnetId,ParameterValue=${PRIVATE_APP_SUBNET_ID}
 			
 			#Old values that are no longer used
 			#ParameterKey=PublicIp,ParameterValue=${PUBLIC_IP} 			
