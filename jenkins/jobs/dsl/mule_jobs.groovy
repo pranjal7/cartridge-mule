@@ -36,7 +36,7 @@ buildJob.with{
     scm {
         git {
             remote {
-                url('${muleGitEnvUrl}')
+                url("${muleGitEnvUrl}")
                 credentials("adop-jenkins-master")
             }
 			branch("*/develop")
@@ -199,13 +199,13 @@ packageJob.with{
 		maven {
 			mavenInstallation("ADOP Maven")
 			goals('clean install -U -DskipTests')
-			goals('deploy:deploy-file -DpomFile=mule-services-usa/pom.xml -Dversion=${B} -DgeneratePom=false -Dpackaging=zip -Dfile=${WORKSPACE}/mule-services-usa/usa-api/target/usa-sprint-1.0.zip -DrepositoryId=deployment -Durl=http://nexus.service.adop.consul/content/repositories/releases')
+			goals('deploy:deploy-file -DpomFile=pom.xml -Dversion=${B} -DgeneratePom=false -Dpackaging=zip -Dfile=${WORKSPACE}/target/afp4mule-reference-app.zip -DrepositoryId=deployment -Durl=http://nexus.service.adop.consul/content/repositories/releases')
 		}
     }
     publishers{
 		archiveArtifacts {
-            pattern('mule-services-usa/usa-api/target/*.zip')
-			pattern('mule-services-usa/usa-api/usa_env_tokens_default.properties')
+            pattern('target/*.zip')
+			pattern('afp4mule_env_default.properties')
 			allowEmpty(false)
             onlyIfSuccessful(false)
 			fingerprint(false)
@@ -253,7 +253,7 @@ deployJob.with{
 	scm {
         git {
             remote {
-                url('${devOpsEnvGitUrl}')
+                url("${devOpsEnvGitUrl}")
                 credentials("adop-jenkins-master")
             }
 			branch("*/master")
@@ -264,8 +264,8 @@ deployJob.with{
 			buildSelector {
                 buildNumber('${B}')
             }
-			includePatterns('mule-services-usa/usa-api/target/*.zip')
-			includePatterns('mule-services-usa/usa-api/usa_env_tokens_default.properties')
+			includePatterns('target/*.zip')
+			includePatterns('afp4mule_env_default.properties')
 			fingerprintArtifacts(true)
 		}
 		shell('''#!/bin/bash ---login
@@ -280,7 +280,7 @@ echo  "Preparing build artifact(s) for tokenization"
 echo  "  - application of environment specific configuration."
 echo "***************************************"
 
-ARTIFACTS=$(find mule-services-usa/usa-api/target/ -name *.zip) 
+ARTIFACTS=$(find target/ -name *.zip) 
 
 echo $ARTIFACTS
 
