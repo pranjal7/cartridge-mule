@@ -18,7 +18,7 @@ createMuleStack.with{
 		stringParam("GIT_URL","ssh://git@newsource.accenture.com/a2482/mule_environment_template.git","The URL of the git repo for Platform Extension")
 		stringParam("STACK_NAME","","The name of the new stack")
 		stringParam("TAG_PROJECT_NAME","","The name of the project to tag instances with")
-        stringParam("KEY_NAME","academy_key","Name of the key for this stack")
+        stringParam("KEY_NAME","D1SESwarmTestKey","Name of the key for this stack")
 		stringParam("PRIVATE_IP","10.0.6.6","PrivateIp address for Mule Env")
 		stringParam("PRIVATE_APP_SUBNET_ID","","PrivateIp address for Mule Env")
 		credentialsParam("AWS_CREDENTIALS"){
