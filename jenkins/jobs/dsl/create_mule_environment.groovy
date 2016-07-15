@@ -6,21 +6,21 @@ def projectFolderName = "${PROJECT_NAME}"
 def environmentTemplateGitUrl = "ssh://git@newsource.accenture.com/a2482/mule_environment_template.git"
 
 // Jobs
-def createMuleStack = freeStyleJob(projectFolderName + "/Create_Mule_Stack")
+def createMuleInstance = freeStyleJob(projectFolderName + "/create_Mule_Instance")
 
 // Create Mule Stack
-createMuleStack.with{
-	description("Job to provision the environment for Mule")
+createMuleInstance.with{
+	description("Job to provision the Mule instance on AWS")
 	logRotator {
 		numToKeep(25)
     }
 	parameters{
 		stringParam("GIT_URL","ssh://git@newsource.accenture.com/a2482/mule_environment_template.git","The URL of the git repo for Platform Extension")
-		stringParam("STACK_NAME","","The name of the new stack")
-		stringParam("TAG_PROJECT_NAME","","The name of the project to tag instances with")
+		stringParam("STACK_NAME","D1SE-Mule","The name of the new stack")
+		stringParam("TAG_PROJECT_NAME","D1SE","The name of the project to tag instances with")
         stringParam("KEY_NAME","d1se_key","Name of the key for this stack")
 		stringParam("PRIVATE_IP","10.0.6.6","PrivateIp address for Mule Env")
-		stringParam("PRIVATE_APP_SUBNET_ID","","PrivateIp address for Mule Env")
+		stringParam("AWS_DEFAULT_REGION","eu-west-1","AWS Default Region")
 		credentialsParam("AWS_CREDENTIALS"){
 			type('com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl')
 			description('AWS access key and secret key for your account')
@@ -54,17 +54,17 @@ createMuleStack.with{
 		shell('''#!/bin/bash -ex
 
 			# Variables
-			export AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
+			export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
 			INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
 			VPC_ID=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[0].Instances[0].VpcId' --output text)
-			#SUBNET_ID=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[0].Instances[0].SubnetId' --output text)
-			#NAT_GATEWAY_ID=$(aws ec2 describe-nat-gateways --filter Name=vpc-id,Values=${VPC_ID} --query 'NatGateways[*].NatGatewayId' --output text)
+			PRIVATE_APP_SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=${VPC_ID}" --filters "Name=tag:Name,Values=Private_Application_Subnet" --query 'Subnets[0].SubnetId' --output text)
 			PUBLIC_IP=$(curl http://169.254.169.254/latest/meta-data/public-ipv4)
-			#INTERNET_GATEWAY_ID=$(aws ec2 describe-internet-gateways --filters "Name=attachment.vpc-id,Values=$VPC_ID" --query 'InternetGateways[0].InternetGatewayId' --output text)
 			
-			#ADOP_CIDR=$(aws ec2 describe-subnets --subnet-ids ${AWS_SUBNET_ID} --query 'Subnets[0].CidrBlock' --output text)
-			#ADOP_AZ=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[0].Instances[0].Placement.AvailabilityZone' --output text)
-			#ADOP_IP=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[0].Instances[0].PrivateIpAddress' --output text)
+			# SUBNET_ID=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[0].Instances[0].SubnetId' --output text)
+			# NAT_GATEWAY_ID=$(aws ec2 describe-nat-gateways --filter Name=vpc-id,Values=${VPC_ID} --query 'NatGateways[*].NatGatewayId' --output text)	
+			# ADOP_CIDR=$(aws ec2 describe-subnets --subnet-ids ${AWS_SUBNET_ID} --query 'Subnets[0].CidrBlock' --output text)
+			# ADOP_AZ=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[0].Instances[0].Placement.AvailabilityZone' --output text)
+			# ADOP_IP=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[0].Instances[0].PrivateIpAddress' --output text)
 			
 			
 			aws cloudformation create-stack --stack-name ${STACK_NAME} \
