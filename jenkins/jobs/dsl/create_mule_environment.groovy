@@ -6,7 +6,7 @@ def projectFolderName = "${PROJECT_NAME}"
 def environmentTemplateGitUrl = "ssh://git@newsource.accenture.com/a2482/mule_environment_template.git"
 
 // Jobs
-def createMuleInstance = freeStyleJob(projectFolderName + "/create_Mule_Instance")
+def createMuleInstance = freeStyleJob(projectFolderName + "/Create_Mule_Instance")
 
 // Create Mule Stack
 createMuleInstance.with{
@@ -67,7 +67,7 @@ createMuleInstance.with{
 			# ADOP_IP=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[0].Instances[0].PrivateIpAddress' --output text)
 			
 			
-			aws cloudformation create-stack --stack-name ${STACK_NAME} \
+			aws cloudformation create-stack --stack-name ${STACK_NAME} --capabilities "CAPABILITY_IAM" \
 			--tags "Key=CreatedBy,Value=ADOP-Jenkins" "Key=Project,Value=${TAG_PROJECT_NAME}" \
 			--template-body file://$WORKSPACE/aws/aws_mule_template.json \
 			--parameters \
