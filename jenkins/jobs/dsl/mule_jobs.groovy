@@ -5,7 +5,7 @@ def projectFolderName = "${PROJECT_NAME}"
 // Variables
 def muleEnvRepoName = "mule"
 def muleGitEnvUrl = "ssh://jenkins@gerrit:29418/${PROJECT_NAME}/" + muleEnvRepoName
-def devOpsEnvRepoName = "DevOpsEnv"
+def devOpsEnvRepoName = "DevOps-ENV"
 def devOpsEnvGitUrl = "ssh://jenkins@gerrit:29418/${PROJECT_NAME}/" + devOpsEnvRepoName
 
 // Jobs
@@ -15,9 +15,9 @@ def packageJob = freeStyleJob(projectFolderName + "/afp4Mule-Package")
 def deployJob = freeStyleJob(projectFolderName + "/afp4Mule-Deploy")
 
 // Views
-def MuleBuildPipelineView = buildPipelineView(projectFolderName + "/Mule_Deployment")
+def MuleBuildPipelineView = buildPipelineView(projectFolderName + "/Mule_Code_Pipeline")
 MuleBuildPipelineView.with{
-    title('Mule Deployment Pipeline')
+    title('Mule Code Pipeline')
     displayedBuilds(5)
     selectedJob(projectFolderName + "/afp4Mule-Build")
     showPipelineParameters()
@@ -26,7 +26,7 @@ MuleBuildPipelineView.with{
 }
 
 buildJob.with{
-    description("The AFP4Mule reference application build job.")
+    description("The AFP4Mule application build job.")
     logRotator {
     daysToKeep(7)
     numToKeep(7)
@@ -115,7 +115,7 @@ buildJob.with{
 }
 
 sonarJob.with{
-    description("Sample AFP4Mule Sonar static code analysis job")
+    description("Sample AFP4Mule Sonar static code analysis job.")
     logRotator {
     daysToKeep(7)
     numToKeep(7)
@@ -146,17 +146,14 @@ sonarJob.with{
     }
     publishers{
 		sonar {'''
+			installationName('ADOP Sonar')
 			mavenInstallation('ADOP Maven')
 			rootPOM('mule-services-usa/pom.xml')
 			additionalProperties('-Dsonar.scm.url=scm:git:https://innersource.accenture.com/digital-1/afp4mule-reference-app.git')
-            branch('feature-xy')
-            overrideTriggers {
-                skipIfEnvironmentVariable('SKIP_SONAR')
-            }
 		'''}			
         downstreamParameterized{
-            trigger(projectFolderName + "/afp4Mule-Sonar"){
-				condition("SUCCESS")
+            trigger(projectFolderName + "/afp4Mule-Package"){
+				condition("UNSTABLE_OR_BETTER")
 				triggerWithNoParameters(false)
 				parameters{
                 predefinedProp("B",'${BUILD_NUMBER}')
@@ -168,7 +165,7 @@ sonarJob.with{
 }
 
 packageJob.with{
-	description("Sample AFP4Mule Sonar static code analysis job")
+	description("The AFP4Mule application artifact package job.")
     logRotator {
     daysToKeep(7)
     numToKeep(7)
@@ -198,14 +195,20 @@ packageJob.with{
 		}
 		maven {
 			mavenInstallation("ADOP Maven")
-			goals('clean install -U -DskipTests')
-			goals('deploy:deploy-file -DpomFile=pom.xml -Dversion=${B} -DgeneratePom=false -Dpackaging=zip -Dfile=${WORKSPACE}/target/afp4mule-reference-app.zip -DrepositoryId=deployment -Durl=http://nexus.service.adop.consul/content/repositories/releases')
+			goals('deploy:deploy-file'
+			goals('-DpomFile=mule-services-usa/pom.xml')
+			goals('-Dversion=${B}')
+			goals('-DgeneratePom=false')
+			goals('-Dpackaging=zip')
+			goals('-Dfile=${WORKSPACE}/mule-services-usa/usa-api/target/usa-sprint-1.0.zip')
+			goals('-DrepositoryId=deployment')
+			goals('-Durl=http://nexus.service.adop.consul/content/repositories/releases')
 		}
     }
     publishers{
 		archiveArtifacts {
-            pattern('target/*.zip')
-			pattern('afp4mule_env_default.properties')
+            pattern('mule-services-usa/usa-api/target/*.zip')
+			pattern('mule-services-usa/usa-api/usa_env_tokens_default.properties')
 			allowEmpty(false)
             onlyIfSuccessful(false)
 			fingerprint(false)
@@ -225,7 +228,7 @@ packageJob.with{
 }
 
 deployJob.with{
-	description("The AFP4Mule sample application deploy job.")
+	description("The AFP4Mule application deploy job.")
     logRotator {
     daysToKeep(7)
     numToKeep(7)
@@ -235,9 +238,9 @@ deployJob.with{
     parameters{
         stringParam("B",,"The build number of the parent build to pull.")
         stringParam("PARENT_BUILD",,"The parent build to pull the artifact from.")
-		choiceParam("ENVIRONMENT", ["ENV001", "option 2"], "Environment to deploy build.")
+		choiceParam("ENVIRONMENT","ENV001", "Environment to deploy build.")
 		stringParam("MULE_EE_SERVER_IP","10.0.6.6","Mule EE server ipaddress")
-		stringParam("MULE_EE_CONTAINER_NAME","afp4mule-mule-env001","Mule EE container name")
+		stringParam("MULE_EE_CONTAINER_NAME","mule-runtime","Mule EE container name")
     }
 	environmentVariables {
         env('WORKSPACE_NAME',workspaceFolderName)
@@ -257,6 +260,9 @@ deployJob.with{
                 credentials("adop-jenkins-master")
             }
 			branch("*/master")
+			extensions {
+                relativeTargetDirectory('devops_envs/')
+            }
 		}
     }
     steps {
@@ -339,7 +345,7 @@ echo  "Deploying artifact(s)"
 echo "***************************************"
 
 
-ARTIFACTS=$(find ${WORKSPACE}/tokenized/ -name *.zip)
+ARTIFACTS=$(find ${WORKSPACE}/tokenized/ -name "*.zip")
 
 echo "Artifacts to deploy"
 echo $ARTIFACTS
@@ -353,7 +359,7 @@ do
 done
 
 ssh -tt -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ec2-user@${MULE_EE_SERVER_IP} '
-      sudo docker stop mule-runtime
+      sudo swarm stop mule-runtime
       sudo rm -rf /data/mule/apps/*
       for i in $(find ~/ -name '*.zip')
       do
@@ -361,7 +367,7 @@ ssh -tt -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ec2-user@${M
         sudo unzip ${i} -d /data/mule/apps/$(basename ${i}) 1>/dev/null
       done
       
-      sudo docker start mule-runtime
+      sudo swarm start mule-runtime
 '
 
 echo 
@@ -379,7 +385,7 @@ SLEEP_TIME="30"
 COUNT=0
 
 echo "Waiting for environment to become accessible."
-until curl -sL -w "%{http_code}\\n" "http://${MULE_EE_CONTAINER_NAME}.service.adop.consul:8084/api/" -o /dev/null | grep "200" &> /dev/null
+until curl -sL -w "%{http_code}\\n" "http://${MULE_EE_CONTAINER_NAME}.adop.internal/api/console" -o /dev/null | grep "200" &> /dev/null
 do
     if [ "${COUNT}" == "10" ]
       then
