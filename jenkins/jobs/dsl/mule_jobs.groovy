@@ -146,7 +146,6 @@ sonarJob.with{
     }
     publishers{
 		sonar {
-			installationName('ADOP Sonar')
 			mavenInstallation('ADOP Maven')
 			rootPOM('mule-services-usa/pom.xml')
 			additionalProperties('-Dsonar.scm.url=scm:git:https://innersource.accenture.com/digital-1/afp4mule-reference-app.git')
