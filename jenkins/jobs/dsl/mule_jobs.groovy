@@ -195,7 +195,7 @@ packageJob.with{
 		}
 		maven {
 			mavenInstallation("ADOP Maven")
-			goals('deploy:deploy-file'
+			goals('deploy:deploy-file')
 			goals('-DpomFile=mule-services-usa/pom.xml')
 			goals('-Dversion=${B}')
 			goals('-DgeneratePom=false')
