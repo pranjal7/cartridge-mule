@@ -258,11 +258,9 @@ deployJob.with{
             remote {
                 url("${devOpsEnvGitUrl}")
                 credentials("adop-jenkins-master")
+				relativeTargetDir("devops_envs/")
             }
 			branch("*/master")
-			extensions {
-                relativeTargetDirectory("devops_envs/")
-            }
 		}
     }
     steps {
