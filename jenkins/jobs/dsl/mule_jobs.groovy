@@ -234,7 +234,7 @@ deployJob.with{
     }	
     parameters{
         stringParam("B","","The build number of the parent build to pull.")
-        stringParam("PARENT_BUILD",'projectFolderName + "/afp4Mule-Build"',"The parent build to pull the artifact from.")
+        stringParam("PARENT_BUILD",projectFolderName + "/afp4Mule-Build","The parent build to pull the artifact from.")
 		stringParam("ENVIRONMENT","ENV001","Environment to deploy build.")
 		stringParam("MULE_EE_SERVER_IP","10.0.6.6","Mule EE server ipaddress")
 		stringParam("MULE_EE_CONTAINER_NAME","mule-runtime","Mule EE container name")
