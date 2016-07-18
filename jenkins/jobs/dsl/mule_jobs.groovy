@@ -145,12 +145,12 @@ sonarJob.with{
 		}
     }
     publishers{
-		sonar {'''
+		sonar {
 			installationName('ADOP Sonar')
 			mavenInstallation('ADOP Maven')
 			rootPOM('mule-services-usa/pom.xml')
 			additionalProperties('-Dsonar.scm.url=scm:git:https://innersource.accenture.com/digital-1/afp4mule-reference-app.git')
-		'''}			
+			}			
         downstreamParameterized{
             trigger(projectFolderName + "/afp4Mule-Package"){
 				condition("UNSTABLE_OR_BETTER")
@@ -220,7 +220,7 @@ packageJob.with{
 			triggerWithNoParameters(false)
 				parameters{
 					predefinedProp("B",'${BUILD_NUMBER}')
-					predefinedProp("PARENT_BUILD",'${PARENT_BUILD}')               
+					predefinedProp("PARENT_BUILD",'${JOB_NAME}')               
 				}
             }
         } 
@@ -236,8 +236,8 @@ deployJob.with{
 	artifactNumToKeep(7)
     }	
     parameters{
-        stringParam("B",,"The build number of the parent build to pull.")
-        stringParam("PARENT_BUILD",,"The parent build to pull the artifact from.")
+        stringParam("B","","The build number of the parent build to pull.")
+        stringParam("PARENT_BUILD",'projectFolderName + "/afp4Mule-Build"',"The parent build to pull the artifact from.")
 		stringParam("ENVIRONMENT","ENV001","Environment to deploy build.")
 		stringParam("MULE_EE_SERVER_IP","10.0.6.6","Mule EE server ipaddress")
 		stringParam("MULE_EE_CONTAINER_NAME","mule-runtime","Mule EE container name")
