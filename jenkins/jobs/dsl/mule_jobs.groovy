@@ -145,7 +145,7 @@ sonarJob.with{
     }
     publishers{
 		configure {
-			it / 'builders' << 'hudson.plugins.sonar.SonarPublisher plugin="sonar@2.2.1"' {
+			it / 'publishers' << 'hudson.plugins.sonar.SonarPublisher plugin="sonar@2.2.1"' {
 			jobAdditionalProperties '-Dsonar.scm.url=scm:git:https://innersource.accenture.com/digital-1/afp4mule-reference-app.git'
 			mavenInstallationName 'ADOP Maven'
 			rootPom 'pom.xml'
