@@ -79,7 +79,6 @@ buildJob.with{
 		maven {
 			mavenInstallation("ADOP Maven")
 			goals('clean install -U -DskipTests')
-			rootPOM('mule-services-usa/pom.xml')
 		}
 		systemGroovyScriptFile('/var/jenkins_home/scriptler/scripts/pipeline_params.groovy') {
         }
@@ -193,19 +192,19 @@ packageJob.with{
 		maven {
 			mavenInstallation("ADOP Maven")
 			goals('deploy:deploy-file')
-			goals('-DpomFile=mule-services-usa/pom.xml')
+			goals('-DpomFile=pom.xml')
 			goals('-Dversion=${B}')
 			goals('-DgeneratePom=false')
 			goals('-Dpackaging=zip')
-			goals('-Dfile=${WORKSPACE}/mule-services-usa/usa-api/target/usa-sprint-1.0.zip')
+			goals('-Dfile=${WORKSPACE}/target/afp4mule-reference-app.zip')
 			goals('-DrepositoryId=deployment')
 			goals('-Durl=http://nexus.service.adop.consul/content/repositories/releases')
 		}
     }
     publishers{
 		archiveArtifacts {
-            pattern('mule-services-usa/usa-api/target/*.zip')
-			pattern('mule-services-usa/usa-api/usa_env_tokens_default.properties')
+            pattern('target/*.zip')
+			pattern('afp4mule_env_default.properties')
 			allowEmpty(false)
             onlyIfSuccessful(false)
 			fingerprint(false)
@@ -269,7 +268,7 @@ deployJob.with{
 			includePatterns('afp4mule_env_default.properties')
 			fingerprintArtifacts(true)
 		}
-		shell('''#!/bin/bash ---login
+		shell('''#!/bin/bash ---login	
 DOCKER_VERSION=1.6.0
 
 wget https://get.docker.com/builds/Linux/x86_64/docker-${DOCKER_VERSION} --quiet -O docker
@@ -282,8 +281,6 @@ echo  "  - application of environment specific configuration."
 echo "***************************************"
 
 ARTIFACTS=$(find target/ -name *.zip) 
-
-echo $ARTIFACTS
 
 mkdir -p ${WORKSPACE}/{artifacts,tokenized}/
 
@@ -313,7 +310,7 @@ echo "***************************************"
     -t \
     --rm \
     -v /data/jenkins/home/jobs/afp4mule/jobs/afp4Mule-sf-deploy/workspace/:/root/workdir/artifacts/ \
-    docker.accenture.com/adop/tokenization:0.0.1 perl /root/workdir/token_resolver_template.pl --tokenFile /root/workdir/artifacts/devops_envs/${ENVIRONMENT}.properties --tokenFile /root/workdir/artifacts/mule-services-usa/usa-api/usa_env_tokens_default.properties --fileList /root/workdir/artifacts/files_to_tokenise.txt --force
+    docker.accenture.com/adop/tokenization:0.0.1 perl /root/workdir/token_resolver_template.pl --tokenFile /root/workdir/artifacts/devops_envs/${ENVIRONMENT}.properties --tokenFile /root/workdir/artifacts/afp4mule_env_default.properties --fileList /root/workdir/artifacts/files_to_tokenise.txt --force
 
 echo 
 echo "***************************************"
@@ -323,15 +320,10 @@ echo "***************************************"
 
 ARTIFACTS=$(find artifacts/ -maxdepth 1 -mindepth 1 -type d)
 
-echo "TESTINGGGG"
-echo $ARTIFACTS
-
 for ARTIFACT in ${ARTIFACTS} 
 do 
-echo "TESTINGGGG"
-echo $ARTIFACT
   cd $ARTIFACT
-  zip -r ${WORKSPACE}/tokenized/$(basename $ARTIFACT).zip ./*
+  zip -r ${WORKSPACE}/tokenized/$(basename $ARTIFACT) ./*
 done
 
 echo 
@@ -340,29 +332,22 @@ echo  "Deploying artifact(s)"
 echo "***************************************"
 
 
-ARTIFACTS=$(find ${WORKSPACE}/tokenized/ -name "*.zip")
-
-echo "Artifacts to deploy"
-echo $ARTIFACTS
-
+ARTIFACTS=$(find ${WORKSPACE}/tokenized/ -name *.zip)
 
 for ARTIFACT in ${ARTIFACTS} 
 do 
   scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $ARTIFACT ec2-user@${MULE_EE_SERVER_IP}:~/
-  echo $ARTIFACT
-
 done
 
 ssh -tt -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ec2-user@${MULE_EE_SERVER_IP} '
-      sudo swarm stop mule-runtime
+      sudo docker stop mule-runtime
       sudo rm -rf /data/mule/apps/*
-      for i in $(find ~/ -name '*.zip')
+      for i in $(find ~/. -name *.zip)
       do
-      	echo ${i}
-        sudo unzip ${i} -d /data/mule/apps/$(basename ${i}) 1>/dev/null
+        sudo unzip ${i} -d /data/mule/apps/$(basename ${i} .zip) 1>/dev/null
       done
       
-      sudo swarm start mule-runtime
+      sudo docker start mule-runtime
 '
 
 echo 
@@ -380,7 +365,7 @@ SLEEP_TIME="30"
 COUNT=0
 
 echo "Waiting for environment to become accessible."
-until curl -sL -w "%{http_code}\\n" "http://${MULE_EE_CONTAINER_NAME}.adop.internal/api/console" -o /dev/null | grep "200" &> /dev/null
+until curl -sL -w "%{http_code}\\n" "http://${MULE_EE_CONTAINER_NAME}.adop.internal:8084/api/" -o /dev/null | grep "200" &> /dev/null
 do
     if [ "${COUNT}" == "10" ]
       then
@@ -398,9 +383,6 @@ echo "***************************************"
 echo  "Artifact(s) deployed succesfully"
 echo "***************************************"
 			
-			
-			
-
 ''')
     }
 }
