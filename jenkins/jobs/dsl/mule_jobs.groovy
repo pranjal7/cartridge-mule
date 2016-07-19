@@ -144,9 +144,13 @@ sonarJob.with{
 		}
     }
     publishers{
-		sonar {
-			additionalProperties('-Dsonar.scm.url=scm:git:https://innersource.accenture.com/digital-1/afp4mule-reference-app.git')
-			}			
+		configure {
+			it / 'builders' << 'hudson.plugins.sonar.SonarPublisher plugin="sonar@2.2.1"' {
+			jobAdditionalProperties '-Dsonar.scm.url=scm:git:https://innersource.accenture.com/digital-1/afp4mule-reference-app.git'
+			mavenInstallationName 'ADOP Maven'
+			rootPom 'pom.xml'
+			}
+		}
         downstreamParameterized{
             trigger(projectFolderName + "/afp4Mule-Package"){
 				condition("UNSTABLE_OR_BETTER")
@@ -340,14 +344,14 @@ do
 done
 
 ssh -tt -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ec2-user@${MULE_EE_SERVER_IP} '
-      sudo docker stop mule-runtime
+      sudo swarm stop mule-runtime
       sudo rm -rf /data/mule/apps/*
       for i in $(find ~/. -name *.zip)
       do
         sudo unzip ${i} -d /data/mule/apps/$(basename ${i} .zip) 1>/dev/null
       done
       
-      sudo docker start mule-runtime
+      sudo swarm start mule-runtime
 '
 
 echo 
