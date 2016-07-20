@@ -6,11 +6,11 @@ def projectFolderName = "${PROJECT_NAME}"
 def environmentTemplateGitUrl = "ssh://git@newsource.accenture.com/a2482/mule_environment_template.git"
 
 // Jobs
-def createMuleInstance = freeStyleJob(projectFolderName + "/Create_Mule_Instance")
+def createMuleStack = freeStyleJob(projectFolderName + "/Create_Mule_Stack")
 
 // Create Mule Instance
-createMuleInstance.with{
-	description("Job to provision the Mule instance on AWS")
+createMuleStack.with{
+	description("Job to provision the Mule stack on AWS")
 	logRotator {
 		numToKeep(25)
     }
