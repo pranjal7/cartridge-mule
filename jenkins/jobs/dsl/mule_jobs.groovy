@@ -3,7 +3,7 @@ def workspaceFolderName = "${WORKSPACE_NAME}"
 def projectFolderName = "${PROJECT_NAME}"
 
 // Variables
-def muleEnvRepoName = "mule"
+def muleEnvRepoName = "afp4mule-reference-app"
 def muleGitEnvUrl = "ssh://jenkins@gerrit:29418/${PROJECT_NAME}/" + muleEnvRepoName
 def devOpsEnvRepoName = "DevOps-ENV"
 def devOpsEnvGitUrl = "ssh://jenkins@gerrit:29418/${PROJECT_NAME}/" + devOpsEnvRepoName
@@ -146,7 +146,7 @@ sonarJob.with{
     publishers{
 		configure {
 			it / 'publishers' << 'hudson.plugins.sonar.SonarPublisher' {
-			jobAdditionalProperties '-Dsonar.scm.url=scm:git:https://innersource.accenture.com/digital-1/afp4mule-reference-app.git'
+			jobAdditionalProperties '-Dsonar.scm.url=scm:git:ssh://gerrit:29418/D1SE_Workspace/D1SE_Project/Cartridge-Mule/afp4mule-reference-app'
 			mavenInstallationName 'ADOP Maven'
 			rootPom 'pom.xml'
 			}
