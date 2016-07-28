@@ -39,7 +39,7 @@ buildJob.with{
                 url("${muleGitEnvUrl}")
                 credentials("adop-jenkins-master")
             }
-			branch("*/develop")
+			branch("*/master")
 		}
     }
 	environmentVariables {
@@ -65,7 +65,7 @@ buildJob.with{
                         'branches' {
                             'com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch' {
                                 compareType("PLAIN")
-                                pattern("develop")
+                                pattern("master")
                             }
                         }
                     }
