@@ -202,7 +202,7 @@ packageJob.with{
 			goals('-Dpackaging=zip')
 			goals('-Dfile=${WORKSPACE}/target/afp4mule-reference-app.zip')
 			goals('-DrepositoryId=deployment')
-			goals('-Durl=http://nexus.service.adop.consul/content/repositories/releases')
+			goals('-Durl=http://nexus:8081/nexus/content/repositories/releases')
 		}
     }
     publishers{
