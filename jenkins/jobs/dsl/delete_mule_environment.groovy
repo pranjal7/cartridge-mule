@@ -53,7 +53,7 @@ deleteMuleStack.with{
         
 			# Check that the stack has been deleted
 			TIME_SPENT=$(($COUNT * $SLEEP_TIME))
-			if $(aws cloudformation describe-stacks --stack-name ${STACK_NAME}
+			if $(aws cloudformation describe-stacks --stack-name ${STACK_NAME})
 			then
 				echo "Stack has been deleted in approximately ${TIME_SPENT} seconds."
 			else
