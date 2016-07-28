@@ -272,7 +272,7 @@ deployJob.with{
 			includePatterns('afp4mule_env_default.properties')
 			fingerprintArtifacts(true)
 		}
-		shell('''#!/bin/bash ---login	
+		shell('''#!/bin/bash --login	
 DOCKER_VERSION=1.6.0
 
 wget https://get.docker.com/builds/Linux/x86_64/docker-${DOCKER_VERSION} --quiet -O docker
