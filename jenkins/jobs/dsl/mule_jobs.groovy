@@ -272,11 +272,15 @@ deployJob.with{
 			includePatterns('afp4mule_env_default.properties')
 			fingerprintArtifacts(true)
 		}
-		shell('''#!/bin/bash --login	
+		shell('''#!/bin/bash --login
+
+set -xe		
 DOCKER_VERSION=1.6.0
 
 wget https://get.docker.com/builds/Linux/x86_64/docker-${DOCKER_VERSION} --quiet -O docker
 chmod +x ./docker
+
+yum install -y zip unzip
 
 echo 
 echo "***************************************"
@@ -302,19 +306,33 @@ echo  "Tokenizing build(s)"
 echo "***************************************"
 
 ./docker login -u devops.training -p ztNsaJPyrSyrPdtn -e devops.training@accenture.com docker.accenture.com
-./docker \
+echo "Login to Docker Registry was successful"
+#./docker \
 	run \
     -t \
     --rm \
     -v /data/jenkins/home/jobs/afp4mule/jobs/afp4Mule-sf-deploy/workspace/:/root/workdir/artifacts/ \
+	
     docker.accenture.com/adop/tokenization:0.0.1 perl -e 'open (MYFILELIST, ">", "/root/workdir/artifacts/files_to_tokenise.txt") || die $!;my @targetFiles=qx(find /root/workdir/artifacts/ -name "*.template");foreach (@targetFiles) {print MYFILELIST "file=$_"};close MYFILELIST;'
-
 ./docker \
 	run \
     -t \
     --rm \
+    -v /var/lib/docker/volumes/jenkins_slave_home/_data/D1SE_Workspace/D1SE_Project/Cartidge-Mule/afp4Mule-Deploy/:/root/workdir/artifacts/ \
+	
+    docker.accenture.com/adop/tokenization:0.0.1 perl -e 'open (MYFILELIST, ">", "/root/workdir/artifacts/files_to_tokenise.txt") || die $!;my @targetFiles=qx(find /root/workdir/artifacts/ -name "*.template");foreach (@targetFiles) {print MYFILELIST "file=$_"};close MYFILELIST;'
+#./docker \
+	run \
+    -t \
+    --rm \ 
     -v /data/jenkins/home/jobs/afp4mule/jobs/afp4Mule-sf-deploy/workspace/:/root/workdir/artifacts/ \
     docker.accenture.com/adop/tokenization:0.0.1 perl /root/workdir/token_resolver_template.pl --tokenFile /root/workdir/artifacts/devops_envs/${ENVIRONMENT}.properties --tokenFile /root/workdir/artifacts/afp4mule_env_default.properties --fileList /root/workdir/artifacts/files_to_tokenise.txt --force
+./docker \
+	run \
+    -t \
+    --rm \
+    -v /var/lib/docker/volumes/jenkins_slave_home/_data/D1SE_Workspace/D1SE_Project/Cartidge-Mule/afp4Mule-Deploy/:/root/workdir/artifacts/ \
+    docker.accenture.com/adop/tokenization:0.0.1 perl /root/workdir/token_resolver_template.pl --tokenFile /root/workdir/artifacts/devops_envs/${ENVIRONMENT}.properties --tokenFile /root/workdir/artifacts/afp4mule_env_default.properties --fileList /root/workdir/artifacts/files_to_tokenise.txt --force	
 
 echo 
 echo "***************************************"
