@@ -318,7 +318,7 @@ echo "Login to Docker Registry was successful"
 	run \
     -t \
     --rm \
-    -v /var/lib/docker/volumes/jenkins_slave_home/_data/D1SE_Workspace/D1SE_Project/Cartidge-Mule/afp4Mule-Deploy/:/root/workdir/artifacts/ \
+    -v /var/lib/docker/volumes/jenkins_slave_home/_data/${PROJECT_NAME}/afp4Mule-Deploy/:/root/workdir/artifacts/ \
 	
     docker.accenture.com/adop/tokenization:0.0.1 perl -e 'open (MYFILELIST, ">", "/root/workdir/artifacts/files_to_tokenise.txt") || die $!;my @targetFiles=qx(find /root/workdir/artifacts/ -name "*.template");foreach (@targetFiles) {print MYFILELIST "file=$_"};close MYFILELIST;'
 #./docker \
@@ -331,7 +331,7 @@ echo "Login to Docker Registry was successful"
 	run \
     -t \
     --rm \
-    -v /var/lib/docker/volumes/jenkins_slave_home/_data/D1SE_Workspace/D1SE_Project/Cartidge-Mule/afp4Mule-Deploy/:/root/workdir/artifacts/ \
+    -v /var/lib/docker/volumes/jenkins_slave_home/_data/${PROJECT_NAME}/afp4Mule-Deploy/:/root/workdir/artifacts/ \
     docker.accenture.com/adop/tokenization:0.0.1 perl /root/workdir/token_resolver_template.pl --tokenFile /root/workdir/artifacts/devops_envs/${ENVIRONMENT}.properties --tokenFile /root/workdir/artifacts/afp4mule_env_default.properties --fileList /root/workdir/artifacts/files_to_tokenise.txt --force	
 
 echo 
