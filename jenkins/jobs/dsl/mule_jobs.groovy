@@ -46,6 +46,13 @@ buildJob.with{
         env('WORKSPACE_NAME',workspaceFolderName)
         env('PROJECT_NAME',projectFolderName)
 	}	
+    properties {
+        configure { project ->
+            project / 'properties' / 'hudson.plugins.copyartifact.CopyArtifactPermissionProperty' / 'projectNameList' {
+            'string' "afp4Mule-Package"
+            }
+        }
+    }
     wrappers {
         preBuildCleanup()
         injectPasswords()
@@ -72,6 +79,7 @@ buildJob.with{
                 }
                 gerritxml / serverName("__ANY__")
             }
+
         }
     }
 	concurrentBuild(false)
