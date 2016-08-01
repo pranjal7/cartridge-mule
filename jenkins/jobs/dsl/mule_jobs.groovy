@@ -332,7 +332,7 @@ echo "Login to Docker Registry was successful"
 #./docker \
 	run \
     -t \
-    --rm \ 
+    --rm \
     -v /data/jenkins/home/jobs/afp4mule/jobs/afp4Mule-sf-deploy/workspace/:/root/workdir/artifacts/ \
     docker.accenture.com/adop/tokenization:0.0.1 perl /root/workdir/token_resolver_template.pl --tokenFile /root/workdir/artifacts/devops_envs/${ENVIRONMENT}.properties --tokenFile /root/workdir/artifacts/afp4mule_env_default.properties --fileList /root/workdir/artifacts/files_to_tokenise.txt --force
 ./docker \
