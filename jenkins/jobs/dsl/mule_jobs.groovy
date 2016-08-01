@@ -50,7 +50,7 @@ buildJob.with{
         configure { project ->
             project / 'properties' / 'hudson.plugins.copyartifact.CopyArtifactPermissionProperty' / 'projectNameList' {
             'string' "afp4Mule-Package"
-            }
+            }
         }
     }
     wrappers {
