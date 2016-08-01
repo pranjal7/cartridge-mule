@@ -50,6 +50,7 @@ buildJob.with{
         configure { project ->
             project / 'properties' / 'hudson.plugins.copyartifact.CopyArtifactPermissionProperty' / 'projectNameList' {
             'string' "afp4Mule-Package"
+            'string' "afp4Mule-Sonar"
             }
         }
     }
@@ -188,6 +189,13 @@ packageJob.with{
         env('WORKSPACE_NAME',workspaceFolderName)
         env('PROJECT_NAME',projectFolderName)
 	}
+    properties {
+        configure { project ->
+            project / 'properties' / 'hudson.plugins.copyartifact.CopyArtifactPermissionProperty' / 'projectNameList' {
+            'string' "afp4Mule-Deploy"
+            }
+        }
+    }
     wrappers {
         preBuildCleanup()
         injectPasswords()
