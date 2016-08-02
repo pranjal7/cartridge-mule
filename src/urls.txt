@@ -1,1 +1,2 @@
 ssh://git@newsource.accenture.com/a1661/afp4mule-reference-app.git
+ssh://git@newsource.accenture.com/a1661/devops_envs.git
