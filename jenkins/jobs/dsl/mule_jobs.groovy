@@ -5,7 +5,7 @@ def projectFolderName = "${PROJECT_NAME}"
 // Variables
 def muleEnvRepoName = "afp4mule-reference-app"
 def muleGitEnvUrl = "ssh://jenkins@gerrit:29418/${PROJECT_NAME}/" + muleEnvRepoName
-def devOpsEnvRepoName = "DevOps-ENV"
+def devOpsEnvRepoName = "devops_envs"
 def devOpsEnvGitUrl = "ssh://jenkins@gerrit:29418/${PROJECT_NAME}/" + devOpsEnvRepoName
 
 // Jobs
