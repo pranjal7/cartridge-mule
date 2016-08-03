@@ -262,7 +262,8 @@ deployJob.with{
         env('WORKSPACE_NAME',workspaceFolderName)
         env('PROJECT_NAME',projectFolderName)
 		
-	}	
+	}
+	label('docker')	
     wrappers {
         preBuildCleanup()
         injectPasswords()
@@ -327,22 +328,23 @@ echo "Login to Docker Registry was successful"
 	run \
     -t \
     --rm \
-    -v /data/jenkins/home/jobs/afp4mule/jobs/afp4Mule-sf-deploy/workspace/:/root/workdir/artifacts/ \
-	
+    -v /data/jenkins/home/jobs/afp4mule/jobs/afp4Mule-sf-deploy/workspace/:/root/workdir/artifacts/ \	
     docker.accenture.com/adop/tokenization:0.0.1 perl -e 'open (MYFILELIST, ">", "/root/workdir/artifacts/files_to_tokenise.txt") || die $!;my @targetFiles=qx(find /root/workdir/artifacts/ -name "*.template");foreach (@targetFiles) {print MYFILELIST "file=$_"};close MYFILELIST;'
+	
 ./docker \
 	run \
     -t \
     --rm \
     -v /var/lib/docker/volumes/jenkins_slave_home/_data/${PROJECT_NAME}/afp4Mule-Deploy/:/root/workdir/artifacts/ \
-	
     docker.accenture.com/adop/tokenization:0.0.1 perl -e 'open (MYFILELIST, ">", "/root/workdir/artifacts/files_to_tokenise.txt") || die $!;my @targetFiles=qx(find /root/workdir/artifacts/ -name "*.template");foreach (@targetFiles) {print MYFILELIST "file=$_"};close MYFILELIST;'
+	
 #./docker \
 	run \
     -t \
     --rm \
     -v /data/jenkins/home/jobs/afp4mule/jobs/afp4Mule-sf-deploy/workspace/:/root/workdir/artifacts/ \
     docker.accenture.com/adop/tokenization:0.0.1 perl /root/workdir/token_resolver_template.pl --tokenFile /root/workdir/artifacts/devops_envs/${ENVIRONMENT}.properties --tokenFile /root/workdir/artifacts/afp4mule_env_default.properties --fileList /root/workdir/artifacts/files_to_tokenise.txt --force
+
 ./docker \
 	run \
     -t \
