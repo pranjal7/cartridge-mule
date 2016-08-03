@@ -328,7 +328,7 @@ echo "Login to Docker Registry was successful"
 	run \
     -t \
     --rm \
-    -v /data/jenkins/home/jobs/afp4mule/jobs/afp4Mule-sf-deploy/workspace/:/root/workdir/artifacts/ \	
+    -v /data/jenkins/home/jobs/afp4mule/jobs/afp4Mule-sf-deploy/workspace/:/root/workdir/artifacts/ \
     docker.accenture.com/adop/tokenization:0.0.1 perl -e 'open (MYFILELIST, ">", "/root/workdir/artifacts/files_to_tokenise.txt") || die $!;my @targetFiles=qx(find /root/workdir/artifacts/ -name "*.template");foreach (@targetFiles) {print MYFILELIST "file=$_"};close MYFILELIST;'
 	
 ./docker \
