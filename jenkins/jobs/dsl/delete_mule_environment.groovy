@@ -55,10 +55,10 @@ deleteMuleStack.with{
 			TIME_SPENT=$(($COUNT * $SLEEP_TIME))
 			if $(aws cloudformation describe-stacks --stack-name ${STACK_NAME})
 			then
-				echo "Stack has been deleted in approximately ${TIME_SPENT} seconds."
-			else
 				echo "ERROR : Stack deletion failed after ${TIME_SPENT} seconds. Please check the AWS console for more information."
 				exit 1
+			else
+				echo "Stack has been deleted in approximately ${TIME_SPENT} seconds."
 			fi
 			
 		''')
