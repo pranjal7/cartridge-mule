@@ -405,7 +405,7 @@ SLEEP_TIME="30"
 COUNT=0
 
 echo "Waiting for environment to become accessible."
-until curl -sL -w "%{http_code}\\n" "http://${MULE_EE_CONTAINER_NAME}.adop.internal:8084/api/" -o /dev/null | grep "200" &> /dev/null
+until curl -sL -w "%{http_code}\\n" "http://mule.adop.internal:8084/api/" -o /dev/null | grep "200" &> /dev/null
 do
     if [ "${COUNT}" == "10" ]
       then
