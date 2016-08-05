@@ -60,13 +60,6 @@ createMuleStack.with{
 			PRIVATE_APP_SUBNET_ID=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=${VPC_ID}" --filters "Name=tag:Name,Values=Private_Application_Subnet" --query 'Subnets[0].SubnetId' --output text)
 			PUBLIC_IP=$(curl http://169.254.169.254/latest/meta-data/public-ipv4)
 			
-			# SUBNET_ID=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[0].Instances[0].SubnetId' --output text)
-			# NAT_GATEWAY_ID=$(aws ec2 describe-nat-gateways --filter Name=vpc-id,Values=${VPC_ID} --query 'NatGateways[*].NatGatewayId' --output text)	
-			# ADOP_CIDR=$(aws ec2 describe-subnets --subnet-ids ${AWS_SUBNET_ID} --query 'Subnets[0].CidrBlock' --output text)
-			# ADOP_AZ=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[0].Instances[0].Placement.AvailabilityZone' --output text)
-			# ADOP_IP=$(aws ec2 describe-instances --instance-ids ${INSTANCE_ID} --query 'Reservations[0].Instances[0].PrivateIpAddress' --output text)
-			
-			
 			aws cloudformation create-stack --stack-name ${STACK_NAME} --capabilities "CAPABILITY_IAM" \
 			--tags "Key=CreatedBy,Value=ADOP-Jenkins" "Key=Project,Value=${TAG_PROJECT_NAME}" \
 			--template-body file://$WORKSPACE/aws/aws_mule_template.json \
