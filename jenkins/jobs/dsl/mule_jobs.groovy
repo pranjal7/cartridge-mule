@@ -305,7 +305,7 @@ echo  "Preparing build artifact(s) for tokenization"
 echo  "  - application of environment specific configuration."
 echo "***************************************"
 
-ARTIFACTS=$(find target/ -name \\*.zip) 
+ARTIFACTS=$(find target/ -name \\*.zip)
 
 mkdir -p ${WORKSPACE}/{artifacts,tokenized}/
 
@@ -382,7 +382,7 @@ done
 ssh -tt -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ec2-user@${MULE_EE_SERVER_IP} '
       sudo docker --config=/home/ec2-user/docker_auth_custom_registry --tlsverify --tlscacert=/home/ec2-user/.certs/ca.pem --tlscert=/home/ec2-user/.certs/cert.pem --tlskey=/home/ec2-user/.certs/key.pem -H manager.adop.internal:3376 stop mule-runtime
       sudo rm -rf /data/mule/apps/*
-      for i in $(find ~/. -name *.zip)
+      for i in $(find ~/. -name \\*.zip)
       do
         sudo unzip ${i} -d /data/mule/apps/$(basename ${i} .zip) 1>/dev/null
       done
