@@ -305,7 +305,7 @@ echo  "Preparing build artifact(s) for tokenization"
 echo  "  - application of environment specific configuration."
 echo "***************************************"
 
-ARTIFACTS=$(find target/ -name \*.zip) 
+ARTIFACTS=$(find target/ -name \\*.zip) 
 
 mkdir -p ${WORKSPACE}/{artifacts,tokenized}/
 
