@@ -45,7 +45,7 @@ buildJob.with{
 	environmentVariables {
         env('WORKSPACE_NAME',workspaceFolderName)
         env('PROJECT_NAME',projectFolderName)
-	}	
+	}
     properties {
         configure { project ->
             project / 'properties' / 'hudson.plugins.copyartifact.CopyArtifactPermissionProperty' / 'projectNameList' {
@@ -84,21 +84,21 @@ buildJob.with{
         }
     }
 	concurrentBuild(false)
-    steps {	
+    steps {
 		maven {
 			mavenInstallation("ADOP Maven")
 			goals('clean install -U -DskipTests')
 		}
 		systemGroovyScriptFile('/var/jenkins_home/scriptler/scripts/pipeline_params.groovy') {
         }
-	}	
+	}
     publishers{
 		archiveArtifacts {
             pattern('**/*')
 			allowEmpty(false)
             onlyIfSuccessful(false)
 			fingerprint(true)
-			defaultExcludes(true)	
+			defaultExcludes(true)
         }
 		git {
 			pushMerge(false)
@@ -115,10 +115,10 @@ buildJob.with{
 			triggerWithNoParameters(false)
             parameters{
                 predefinedProp("B",'${BUILD_NUMBER}')
-                predefinedProp("PARENT_BUILD",'${JOB_NAME}')               
+                predefinedProp("PARENT_BUILD",'${JOB_NAME}')
                 }
             }
-        } 
+        }
     }
 }
 
@@ -129,7 +129,7 @@ sonarJob.with{
     numToKeep(7)
 	artifactDaysToKeep(7)
 	artifactNumToKeep(7)
-    }	
+    }
     parameters{
         stringParam("B",,"The build number of the parent build.")
         stringParam("PARENT_BUILD",,"The parent build to pull artifacts from.")
@@ -166,10 +166,10 @@ sonarJob.with{
 				triggerWithNoParameters(false)
 				parameters{
                 predefinedProp("B",'${BUILD_NUMBER}')
-                predefinedProp("PARENT_BUILD",'${PARENT_BUILD}')               
+                predefinedProp("PARENT_BUILD",'${PARENT_BUILD}')
 				}
 			}
-		} 	
+		}
     }
 }
 
@@ -180,7 +180,7 @@ packageJob.with{
     numToKeep(7)
 	artifactDaysToKeep(7)
 	artifactNumToKeep(7)
-    }	
+    }
     parameters{
         stringParam("B",,"The build number from the PARENT_BUILD to pull artifacts.")
         stringParam("PARENT_BUILD",,"The parent build to search for packages.")
@@ -228,18 +228,18 @@ packageJob.with{
 			allowEmpty(false)
             onlyIfSuccessful(false)
 			fingerprint(false)
-			defaultExcludes(true)	
-        }		
+			defaultExcludes(true)
+        }
         downstreamParameterized{
             trigger(projectFolderName + "/afp4Mule-Deploy"){
             condition("UNSTABLE_OR_BETTER")
 			triggerWithNoParameters(false)
 				parameters{
 					predefinedProp("B",'${BUILD_NUMBER}')
-					predefinedProp("PARENT_BUILD",'${JOB_NAME}')               
+					predefinedProp("PARENT_BUILD",'${JOB_NAME}')
 				}
             }
-        } 
+        }
     }
 }
 
@@ -250,7 +250,7 @@ deployJob.with{
     numToKeep(7)
 	artifactDaysToKeep(7)
 	artifactNumToKeep(7)
-    }	
+    }
     parameters{
         stringParam("B","","The build number of the parent build to pull.")
         stringParam("PARENT_BUILD",projectFolderName + "/afp4Mule-Build","The parent build to pull the artifact from.")
@@ -261,9 +261,9 @@ deployJob.with{
 	environmentVariables {
         env('WORKSPACE_NAME',workspaceFolderName)
         env('PROJECT_NAME',projectFolderName)
-		
+
 	}
-	label('docker')	
+	label('docker')
     wrappers {
         preBuildCleanup()
         injectPasswords()
@@ -291,7 +291,7 @@ deployJob.with{
 		}
 		shell('''#!/bin/bash --login
 
-set -xe		
+set -xe
 DOCKER_VERSION=1.6.0
 
 wget https://get.docker.com/builds/Linux/x86_64/docker-${DOCKER_VERSION} --quiet -O docker
@@ -299,25 +299,25 @@ chmod +x ./docker
 
 yum install -y zip unzip
 
-echo 
+echo
 echo "***************************************"
 echo  "Preparing build artifact(s) for tokenization"
 echo  "  - application of environment specific configuration."
 echo "***************************************"
 
-ARTIFACTS=$(find target/ -name *.zip) 
+ARTIFACTS=$(find target/ -name \*.zip) 
 
 mkdir -p ${WORKSPACE}/{artifacts,tokenized}/
 
-for ARTIFACT in ${ARTIFACTS} 
-do 
+for ARTIFACT in ${ARTIFACTS}
+do
   unzip $ARTIFACT -d ${WORKSPACE}/artifacts/$(basename $ARTIFACT .zip)
 done
 
 # Clear up target directory
 rm -rf ${WORKSPACE}/target/
 
-echo 
+echo
 echo "***************************************"
 echo  "Tokenizing build(s)"
 echo "***************************************"
@@ -330,14 +330,14 @@ echo "Login to Docker Registry was successful"
     --rm \
     -v /data/jenkins/home/jobs/afp4mule/jobs/afp4Mule-sf-deploy/workspace/:/root/workdir/artifacts/ \
     docker.accenture.com/adop/tokenization:0.0.1 perl -e 'open (MYFILELIST, ">", "/root/workdir/artifacts/files_to_tokenise.txt") || die $!;my @targetFiles=qx(find /root/workdir/artifacts/ -name "*.template");foreach (@targetFiles) {print MYFILELIST "file=$_"};close MYFILELIST;'
-	
+
 ./docker \
 	run \
     -t \
     --rm \
     -v /var/lib/docker/volumes/jenkins_slave_home/_data/${PROJECT_NAME}/afp4Mule-Deploy/:/root/workdir/artifacts/ \
     docker.accenture.com/adop/tokenization:0.0.1 perl -e 'open (MYFILELIST, ">", "/root/workdir/artifacts/files_to_tokenise.txt") || die $!;my @targetFiles=qx(find /root/workdir/artifacts/ -name "*.template");foreach (@targetFiles) {print MYFILELIST "file=$_"};close MYFILELIST;'
-	
+
 #./docker \
 	run \
     -t \
@@ -350,9 +350,9 @@ echo "Login to Docker Registry was successful"
     -t \
     --rm \
     -v /var/lib/docker/volumes/jenkins_slave_home/_data/${PROJECT_NAME}/afp4Mule-Deploy/:/root/workdir/artifacts/ \
-    docker.accenture.com/adop/tokenization:0.0.1 perl /root/workdir/token_resolver_template.pl --tokenFile /root/workdir/artifacts/devops_envs/${ENVIRONMENT}.properties --tokenFile /root/workdir/artifacts/afp4mule_env_default.properties --fileList /root/workdir/artifacts/files_to_tokenise.txt --force	
+    docker.accenture.com/adop/tokenization:0.0.1 perl /root/workdir/token_resolver_template.pl --tokenFile /root/workdir/artifacts/devops_envs/${ENVIRONMENT}.properties --tokenFile /root/workdir/artifacts/afp4mule_env_default.properties --fileList /root/workdir/artifacts/files_to_tokenise.txt --force
 
-echo 
+echo
 echo "***************************************"
 echo  "Packaging tokenized build(s)"
 echo "***************************************"
@@ -360,13 +360,13 @@ echo "***************************************"
 
 ARTIFACTS=$(find artifacts/ -maxdepth 1 -mindepth 1 -type d)
 
-for ARTIFACT in ${ARTIFACTS} 
-do 
+for ARTIFACT in ${ARTIFACTS}
+do
   cd $ARTIFACT
   zip -r ${WORKSPACE}/tokenized/$(basename $ARTIFACT) ./*
 done
 
-echo 
+echo
 echo "***************************************"
 echo  "Deploying artifact(s)"
 echo "***************************************"
@@ -374,8 +374,8 @@ echo "***************************************"
 
 ARTIFACTS=$(find ${WORKSPACE}/tokenized/ -name *.zip)
 
-for ARTIFACT in ${ARTIFACTS} 
-do 
+for ARTIFACT in ${ARTIFACTS}
+do
   scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $ARTIFACT ec2-user@${MULE_EE_SERVER_IP}:~/
 done
 
@@ -386,17 +386,17 @@ ssh -tt -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ec2-user@${M
       do
         sudo unzip ${i} -d /data/mule/apps/$(basename ${i} .zip) 1>/dev/null
       done
-      
+
       sudo docker --config=/home/ec2-user/docker_auth_custom_registry --tlsverify --tlscacert=/home/ec2-user/.certs/ca.pem --tlscert=/home/ec2-user/.certs/cert.pem --tlskey=/home/ec2-user/.certs/key.pem -H manager.adop.internal:3376 start mule-runtime
 '
 
-echo 
+echo
 echo "***************************************"
 echo  "Artifact(s) deployed"
 echo "***************************************"
 
 
-echo 
+echo
 echo "***************************************"
 echo  "Health Check"
 echo "***************************************"
@@ -418,11 +418,11 @@ do
     COUNT=$((COUNT+1))
 done
 
-echo 
+echo
 echo "***************************************"
 echo  "Artifact(s) deployed succesfully"
 echo "***************************************"
-			
+
 ''')
     }
 }
