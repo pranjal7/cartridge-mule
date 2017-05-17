@@ -20,6 +20,8 @@ createMuleStack.with{
 		stringParam("TAG_PROJECT_NAME","D1SE","The name of the project to tag instances with")
         stringParam("KEY_NAME","d1se_key","Name of the key for this stack")
 		stringParam("PRIVATE_IP","10.0.6.6","PrivateIp address for Mule Env")
+		choiceParam("MuleSoft_License",return['Accenture_Demo', 'External'] , return['error'], "License use")
+		choiceParam("MuleSoft_License_choice",if (MuleSoft_License.equals("Accenture_Demo") { return["Do nothing"]} else if (MuleSoft_License.equals("External") {return["Change license below"]}))  "Accenture_Demo" "External", "License use")
 		stringParam("AWS_DEFAULT_REGION","eu-west-1","AWS Default Region")
 		credentialsParam("AWS_CREDENTIALS"){
 			type('com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl')
@@ -96,6 +98,11 @@ createMuleStack.with{
 			echo "Success! The private IP of your new EC2 instance is $NODE_IP"
 			echo "Please use your provided key, ${KEY_NAME}, in order to SSH onto the instance."
 			
+			#if PROJECT_NAME = Accenture_Demo
+			then
+				echo "License key is for Accenture Demo use"
+				else
+
 			# Keep looping whilst the EC2 instance is still initializing
 			COUNT=0
 			TIME_SPENT=0
