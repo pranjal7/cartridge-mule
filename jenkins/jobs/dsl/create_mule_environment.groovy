@@ -100,9 +100,9 @@ createMuleStack.with{
 			echo "Please use your provided key, ${KEY_NAME}, in order to SSH onto the instance."
 			
 			#if PROJECT_NAME = Accenture_Demo
-			then
-				echo "License key is for Accenture Demo use"
-				else
+			#then
+			#	echo "License key is for Accenture Demo use"
+			#	else
 
 			# Keep looping whilst the EC2 instance is still initializing
 			COUNT=0
