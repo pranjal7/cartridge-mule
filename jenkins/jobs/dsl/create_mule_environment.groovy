@@ -21,6 +21,7 @@ createMuleStack.with{
         stringParam("KEY_NAME","d1se_key","Name of the key for this stack")
 		stringParam("PRIVATE_IP","10.0.6.6","PrivateIp address for Mule Env")
 		choiceParam("MuleSoft_License",['Accenture_Demo (default)', 'External'], "License use")
+		fileParam('$HOME', 'my description')
 		//choiceParam("MuleSoft_License_choice",if (MuleSoft_License.equals("Accenture_Demo") { return["Do nothing"]} else if (MuleSoft_License.equals("External") {return["Change license below"]}))  "Accenture_Demo" "External", "License use")
 		stringParam("AWS_DEFAULT_REGION","eu-west-1","AWS Default Region")
 		credentialsParam("AWS_CREDENTIALS"){
