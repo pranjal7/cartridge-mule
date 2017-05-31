@@ -40,7 +40,7 @@ createMuleStack.with{
 			remote{
 				name("origin")
 				url("${environmentTemplateGitUrl}")
-				credentials("adop-jenkins-master")
+				credentials("pranjal github") //adop-jenkins-master
 			}
 			branch("*/master")
 		}
@@ -49,7 +49,7 @@ createMuleStack.with{
 		preBuildCleanup()
 		injectPasswords()
 		maskPasswords()
-		sshAgent("adop-jenkins-master")
+		sshAgent("pranjal github") //adop-jenkins-master
 		credentialsBinding {
 		  usernamePassword("AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", '${AWS_CREDENTIALS}')
 		}
