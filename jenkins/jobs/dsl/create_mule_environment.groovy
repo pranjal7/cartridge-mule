@@ -3,7 +3,8 @@ def workspaceFolderName = "${WORKSPACE_NAME}"
 def projectFolderName = "${PROJECT_NAME}"
 
 // Variables
-def environmentTemplateGitUrl = "ssh://git@newsource.accenture.com/a2482/mule_environment_template.git"
+def environmentTemplateGitUrl = "https://github.com/pranjal7/digital-1-cartridges.git" //ssh://git@newsource.accenture.com/a2482/mule_environment_template.git"
+//def environmentSetupGitUrl = "ssh://git@newsource.accenture.com/a2482/env-creation-scripts.git"
 
 // Jobs
 def createMuleStack = freeStyleJob(projectFolderName + "/Create_Mule_Stack")
@@ -15,11 +16,12 @@ createMuleStack.with{
 		numToKeep(25)
     }
 	parameters{
-		stringParam("GIT_URL","ssh://git@newsource.accenture.com/a2482/mule_environment_template.git","The URL of the git repo for Platform Extension")
+		stringParam("GIT_URL","https://github.com/pranjal7/digital-1-cartridges.git","The URL of the git repo for Platform Extension") //ssh://git@newsource.accenture.com/a2482/mule_environment_template.git
 		stringParam("STACK_NAME","D1SE-Mule","The name of the new stack")
 		stringParam("TAG_PROJECT_NAME","D1SE","The name of the project to tag instances with")
         stringParam("KEY_NAME","d1se_key","Name of the key for this stack")
 		stringParam("PRIVATE_IP","10.0.6.6","PrivateIp address for Mule Env")
+		//stringParam("GIT_URL","ssh://git@newsource.accenture.com/a2482/env-creation-scripts.git","The URL of the git repo for Setup")
 		choiceParam("MuleSoft_License",['Accenture_Demo (default)', 'External'], "License use")
 		fileParam('$HOME', 'my description')
 		stringParam("AWS_DEFAULT_REGION","eu-west-1","AWS Default Region")
